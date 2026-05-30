@@ -1,0 +1,97 @@
+schema: spec-driven
+
+context: |
+  Project: Dating App / dating website (greenfield, no code yet)
+  Backend: ASP.NET Core (.NET 10.0.201, C#) with SignalR
+  Frontend Web: Angular 20 (standalone components, signals)
+  Frontend Mobile: Kotlin + Jetpack Compose (Material 3) — toolchain not installed yet
+  Database: PostgreSQL
+  Auth: ASP.NET Identity + JWT
+  Infrastructure: Docker 28.4.0
+  OS: Windows (PowerShell 5.1), Git 2.51.0
+
+strict_tdd: false   # no test runner installed yet (greenfield); enable after scaffolding
+
+testing:
+  runner: not-configured
+  unit: none
+  integration: none
+  e2e: none
+  coverage: none
+  linter: none
+  formatter: none
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Prefer incremental delivery over big-bang
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+    - Reference main specs in openspec/specs/ as source of truth
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale (ADR-style)
+    - Prefer Hexagonal/Clean Architecture on backend
+  tasks:
+    - Group by phase, use hierarchical numbering (e.g. 1.1, 1.2)
+    - Keep tasks completable in one session
+    - Each task MUST be independently verifiable
+  apply:
+    - Follow existing code patterns once established
+    tdd: false
+    test_command: ""
+    build_command: "dotnet build"
+  verify:
+    test_command: ""
+    build_command: "dotnet build"
+    coverage_threshold: 80
+  archive:
+    - Warn before merging destructive deltas
+    - Sync delta specs into main specs/
+
+backend:
+  framework: ASP.NET Core
+  language: C#
+  target: net10.0
+  orm: Entity Framework Core (default, confirm during first change)
+  realtime: SignalR
+  test_framework: xUnit (planned, not installed)
+
+frontend:
+  framework: Angular
+  version: "20"
+  language: TypeScript
+  components: standalone
+  state: signals
+  test_framework: Jasmine/Karma (Angular default, planned)
+
+mobile:
+  framework: Jetpack Compose
+  language: Kotlin
+  design_system: Material 3
+  status: toolchain not installed yet
+
+database:
+  engine: PostgreSQL
+  orm: Entity Framework Core (backed by Npgsql)
+
+infrastructure:
+  container: Docker 28.4.0
+  orchestration: Docker Compose (planned)
+  ci_cd: not configured
+
+detected_tools:
+  dotnet_sdk: "10.0.201"
+  dotnet_runtime: "10.0.201"
+  node: "24.11.0"
+  npm: "11.6.0"
+  angular_cli: "20.3.8"
+  git: "2.51.0"
+  docker: "28.4.0"
+  powershell: "5.1.26100.8457"
+  kotlin: not-installed
+  gradle: not-installed
+  android_sdk: not-installed
+
+initialized: 2026-05-29

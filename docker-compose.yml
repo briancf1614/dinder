@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: src/Dinder.Api/Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Default=Host=db;Port=5432;Database=dinder;Username=dinder;Password=dinder_dev
+      - Jwt__Secret=dev-secret-key-change-in-production-min-32-chars!!
+      - Jwt__Issuer=Dinder.Api
+      - Jwt__Audience=Dinder.App
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - dinder-net
+
+  db:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_DB: dinder
+      POSTGRES_USER: dinder
+      POSTGRES_PASSWORD: dinder_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dinder"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dinder-net
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    ports:
+      - "10000:10000"  # Blob
+      - "10001:10001"  # Queue
+      - "10002:10002"  # Table
+    volumes:
+      - azurite-data:/data
+    command: "azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0"
+    networks:
+      - dinder-net
+
+volumes:
+  pgdata:
+  azurite-data:
+
+networks:
+  dinder-net:
+    driver: bridge

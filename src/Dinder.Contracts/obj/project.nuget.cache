@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "g3ymxD7eHH8=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\brian\\Downloads\\app\\src\\Dinder.Contracts\\Dinder.Contracts.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\brian\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}

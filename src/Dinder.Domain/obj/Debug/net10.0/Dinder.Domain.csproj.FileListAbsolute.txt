@@ -1,0 +1,14 @@
+C:\Users\brian\Downloads\app\src\Dinder.Domain\obj\Debug\net10.0\Dinder.Domain.csproj.AssemblyReference.cache
+C:\Users\brian\Downloads\app\src\Dinder.Domain\obj\Debug\net10.0\Dinder.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\brian\Downloads\app\src\Dinder.Domain\obj\Debug\net10.0\Dinder.Domain.AssemblyInfoInputs.cache
+C:\Users\brian\Downloads\app\src\Dinder.Domain\obj\Debug\net10.0\Dinder.Domain.AssemblyInfo.cs
+C:\Users\brian\Downloads\app\src\Dinder.Domain\obj\Debug\net10.0\Dinder.Domain.csproj.CoreCompileInputs.cache
+C:\Users\brian\Downloads\app\src\Dinder.Domain\bin\Debug\net10.0\Dinder.Domain.deps.json
+C:\Users\brian\Downloads\app\src\Dinder.Domain\bin\Debug\net10.0\Dinder.Domain.dll
+C:\Users\brian\Downloads\app\src\Dinder.Domain\bin\Debug\net10.0\Dinder.Domain.pdb
+C:\Users\brian\Downloads\app\src\Dinder.Domain\bin\Debug\net10.0\Dinder.Domain.xml
+C:\Users\brian\Downloads\app\src\Dinder.Domain\obj\Debug\net10.0\Dinder.Domain.dll
+C:\Users\brian\Downloads\app\src\Dinder.Domain\obj\Debug\net10.0\refint\Dinder.Domain.dll
+C:\Users\brian\Downloads\app\src\Dinder.Domain\obj\Debug\net10.0\Dinder.Domain.xml
+C:\Users\brian\Downloads\app\src\Dinder.Domain\obj\Debug\net10.0\Dinder.Domain.pdb
+C:\Users\brian\Downloads\app\src\Dinder.Domain\obj\Debug\net10.0\ref\Dinder.Domain.dll

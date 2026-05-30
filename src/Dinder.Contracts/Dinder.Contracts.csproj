@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Dinder.Contracts</RootNamespace>
+    <AssemblyName>Dinder.Contracts</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dinder.Domain\Dinder.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

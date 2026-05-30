@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="Dinder.Api/Dinder.Api.csproj" />
+  <Project Path="Dinder.Domain/Dinder.Domain.csproj" />
+  <Project Path="Dinder.Application/Dinder.Application.csproj" />
+  <Project Path="Dinder.Infrastructure/Dinder.Infrastructure.csproj" />
+  <Project Path="Dinder.Contracts/Dinder.Contracts.csproj" />
+  <Project Path="..\tests\Dinder.UnitTests\Dinder.UnitTests.csproj" />
+  <Project Path="..\tests\Dinder.IntegrationTests\Dinder.IntegrationTests.csproj" />
+</Solution>
