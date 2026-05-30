@@ -1,0 +1,28 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.DotSettings.user
+.vs/
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+
+# Docker
+.env
+docker-compose.override.yml
+
+# IDE
+.idea/
+*.sln.docstates
+
+# OS
+Thumbs.db
+.DS_Store
+
+# OpenSpec (keep the directory, but not tracking artifacts)
+openspec/project.md
