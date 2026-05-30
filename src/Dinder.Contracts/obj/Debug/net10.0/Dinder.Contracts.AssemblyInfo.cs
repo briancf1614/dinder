@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Dinder.Contracts")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1583362d73da97e37eaca29a5c53e49efbdaeed2")]
 [assembly: System.Reflection.AssemblyProductAttribute("Dinder.Contracts")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Dinder.Contracts")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

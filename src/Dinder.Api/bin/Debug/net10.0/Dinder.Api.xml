@@ -4,6 +4,15 @@
         <name>Dinder.Api</name>
     </assembly>
     <members>
+        <member name="M:Dinder.Api.Controllers.DiscoveryController.GetCandidates(System.Double,System.Double,System.Nullable{System.Guid},System.Int32)">
+            <summary>Get candidate profiles for the current user.</summary>
+        </member>
+        <member name="M:Dinder.Api.Controllers.DiscoveryController.Swipe(Dinder.Api.Controllers.SwipeRequest)">
+            <summary>Swipe on a candidate profile.</summary>
+        </member>
+        <member name="M:Dinder.Api.Controllers.DiscoveryController.GetMatches">
+            <summary>Get active matches for the current user.</summary>
+        </member>
         <member name="M:Dinder.Api.Controllers.IdentityController.Register(Dinder.Api.Controllers.RegisterRequest)">
             <summary>Register a new account with email and password.</summary>
         </member>
@@ -18,6 +27,24 @@
         </member>
         <member name="M:Dinder.Api.Controllers.IdentityController.DeleteAccount">
             <summary>Delete account (GDPR). Requires authentication.</summary>
+        </member>
+        <member name="M:Dinder.Api.Controllers.ProfileController.GetProfile">
+            <summary>Get the current user's profile. Creates on first read.</summary>
+        </member>
+        <member name="M:Dinder.Api.Controllers.ProfileController.UpdateProfile(Dinder.Api.Controllers.UpdateProfileRequest)">
+            <summary>Create or update the current user's profile.</summary>
+        </member>
+        <member name="M:Dinder.Api.Controllers.ProfileController.UpdateLocation(Dinder.Api.Controllers.UpdateLocationRequest)">
+            <summary>Update profile geolocation.</summary>
+        </member>
+        <member name="M:Dinder.Api.Controllers.ProfileController.GetPreferences">
+            <summary>Get discovery preferences.</summary>
+        </member>
+        <member name="M:Dinder.Api.Controllers.ProfileController.UpdatePreferences(Dinder.Api.Controllers.UpdatePreferencesRequest)">
+            <summary>Update discovery preferences.</summary>
+        </member>
+        <member name="M:Dinder.Api.Controllers.ProfileController.ReorderPhotos(Dinder.Api.Controllers.ReorderPhotosRequest)">
+            <summary>Reorder profile photos.</summary>
         </member>
         <member name="T:Program">
             <summary>

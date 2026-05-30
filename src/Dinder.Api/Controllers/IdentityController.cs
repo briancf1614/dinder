@@ -24,7 +24,7 @@ public sealed class IdentityController : ControllerBase
     {
         try
         {
-            var result = await _mediator.Send(new RegisterCommand(request.Email, request.Password));
+            var result = await _mediator.Send(new RegisterCommand(request.Email, request.Password, request.Birthday));
             return Ok(new
             {
                 userId = result.UserId,
@@ -35,6 +35,10 @@ public sealed class IdentityController : ControllerBase
         catch (InvalidOperationException ex) when (ex.Message == "EMAIL_UNAVAILABLE")
         {
             return Conflict(new { error = "Email unavailable." });
+        }
+        catch (InvalidOperationException ex) when (ex.Message == "AGE_GATE")
+        {
+            return StatusCode(422, new { error = "You must be at least 18 years old to register." });
         }
         catch (FluentValidation.ValidationException ex)
         {
@@ -124,7 +128,7 @@ public sealed class IdentityController : ControllerBase
 }
 
 // Request DTOs (inline until moved to Contracts)
-public sealed record RegisterRequest(string Email, string Password);
+public sealed record RegisterRequest(string Email, string Password, DateOnly? Birthday);
 public sealed record LoginRequest(string Email, string Password);
 public sealed record ExternalLoginRequest(string Email, Dinder.Domain.Enums.ExternalProvider Provider, string ProviderUserId);
 public sealed record RefreshRequest(string RefreshToken);

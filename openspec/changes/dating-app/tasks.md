@@ -45,20 +45,20 @@ Chain strategy: feature-branch-chain
 
 ## Phase 2: User Profile (UP-1..UP-5)
 
-- [ ] 2.1 Create `profile.profiles` schema+migration with display name, bio (≤500), gender, interested-in, birthday, `IsDiscoverable`, PostGIS `geography(Point,4326)` location column + GiST index (UP-1, UP-4)
-- [ ] 2.2 Implement `GET/PUT /profile` with create-on-first-read, `IsDiscoverable` auto-set when bio+prefs+approved-photo present (UP-1)
-- [ ] 2.3 Implement browser geolocation capture at profile creation, store via `ST_GeomFromText`, never expose raw coords to other users (UP-4)
-- [ ] 2.4 Implement age-gate validation: reject registration if birthday indicates <18, no account persisted (UP-5)
-- [ ] 2.5 Implement `GET/PUT /profile/preferences` with interested-in genders, age range 18–100, max distance 1–500 km (UP-3)
-- [ ] 2.6 Implement photo ordering via `POST /profile/photos/reorder` and enforce ≤6 limit at upload-URL request time (UP-2)
+- [x] 2.1 Create `profile.profiles` schema+migration with display name, bio (≤500), gender, interested-in, birthday, `IsDiscoverable`, PostGIS `geography(Point,4326)` location column + GiST index (UP-1, UP-4)
+- [x] 2.2 Implement `GET/PUT /profile` with create-on-first-read, `IsDiscoverable` auto-set when bio+prefs+approved-photo present (UP-1)
+- [x] 2.3 Implement browser geolocation capture at profile creation, store via `ST_GeomFromText`, never expose raw coords to other users (UP-4)
+- [x] 2.4 Implement age-gate validation: reject registration if birthday indicates <18, no account persisted (UP-5)
+- [x] 2.5 Implement `GET/PUT /profile/preferences` with interested-in genders, age range 18–100, max distance 1–500 km (UP-3)
+- [x] 2.6 Implement photo ordering via `POST /profile/photos/reorder` and enforce ≤6 limit at upload-URL request time (UP-2)
 
 ## Phase 3: Discovery (DI-1..DI-5)
 
-- [ ] 3.1 Create `discovery.swipes` and `discovery.matches` schema+migration with upsert-capable swipe table and daily-count tracking (DI-2, DI-4)
-- [ ] 3.2 Implement `GET /discovery/candidates?cursor=` with `ST_DWithin` proximity filter, interested-in+age-range filter, exclude self+swiped+banned (DI-1, DI-5)
-- [ ] 3.3 Implement `POST /discovery/swipe` with idempotent upsert, daily count increment, 429 reject at 50/day with UTC-reset header (DI-2, DI-4)
-- [ ] 3.4 Implement atomic mutual-match detection: on right-swipe, check reverse right-swipe → create Match+Conversation in transaction, publish `MatchCreated` domain event (DI-3)
-- [ ] 3.5 Implement `GET /discovery/matches` returning active matches for current user
+- [x] 3.1 Create `discovery.swipes` and `discovery.matches` schema+migration with upsert-capable swipe table and daily-count tracking (DI-2, DI-4)
+- [x] 3.2 Implement `GET /discovery/candidates?cursor=` with `ST_DWithin` proximity filter, interested-in+age-range filter, exclude self+swiped+banned (DI-1, DI-5)
+- [x] 3.3 Implement `POST /discovery/swipe` with idempotent upsert, daily count increment, 429 reject at 50/day with UTC-reset header (DI-2, DI-4)
+- [x] 3.4 Implement atomic mutual-match detection: on right-swipe, check reverse right-swipe → create Match+Conversation in transaction, publish `MatchCreated` domain event (DI-3)
+- [x] 3.5 Implement `GET /discovery/matches` returning active matches for current user
 
 ## Phase 4: Real-Time Chat (RC-1..RC-5)
 

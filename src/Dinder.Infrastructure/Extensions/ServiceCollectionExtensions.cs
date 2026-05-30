@@ -30,6 +30,28 @@ public static class ServiceCollectionExtensions
             });
         });
 
+        services.AddDbContext<ProfileDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.MigrationsHistoryTable(
+                    "__EFMigrationsHistory",
+                    ProfileDbContext.ProfileSchema);
+                npgsqlOptions.UseNetTopologySuite();
+            });
+        });
+
+        services.AddDbContext<DiscoveryDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.MigrationsHistoryTable(
+                    "__EFMigrationsHistory",
+                    DiscoveryDbContext.DiscoverySchema);
+                npgsqlOptions.UseNetTopologySuite();
+            });
+        });
+
         // Auth
         var jwtSecret = configuration["Jwt:Secret"]
             ?? throw new InvalidOperationException("JWT secret not configured.");
@@ -60,6 +82,8 @@ public static class ServiceCollectionExtensions
 
         // Services
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IProfileRepository, ProfileRepository>();
+        services.AddScoped<IDiscoveryRepository, DiscoveryRepository>();
         services.AddSingleton<IJwtService, JwtService>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
 

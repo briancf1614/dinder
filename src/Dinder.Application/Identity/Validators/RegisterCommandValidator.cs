@@ -17,5 +17,18 @@ public sealed class RegisterCommandValidator : AbstractValidator<RegisterCommand
             .MinimumLength(8).WithMessage("Password must be at least 8 characters.")
             .Matches(@"[A-Z]").WithMessage("Password must contain at least one uppercase letter.")
             .Matches(@"[0-9]").WithMessage("Password must contain at least one digit.");
+
+        RuleFor(x => x.Birthday)
+            .Must(b => b.HasValue).WithMessage("Birthday is required.")
+            .Must(b => IsAtLeast18(b!.Value)).WithMessage("You must be at least 18 years old to register.");
+    }
+
+    private static bool IsAtLeast18(DateOnly birthday)
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var age = today.Year - birthday.Year;
+        if (birthday > today.AddYears(-age))
+            age--;
+        return age >= 18;
     }
 }

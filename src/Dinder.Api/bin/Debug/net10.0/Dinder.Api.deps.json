@@ -734,7 +734,8 @@
       },
       "Dinder.Domain/1.0.0": {
         "dependencies": {
-          "MediatR.Contracts": "2.0.1"
+          "MediatR.Contracts": "2.0.1",
+          "NetTopologySuite": "2.6.0"
         },
         "runtime": {
           "Dinder.Domain.dll": {

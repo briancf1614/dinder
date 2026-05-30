@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "g3ymxD7eHH8=",
+  "dgSpecHash": "fi1kCTn4M6Y=",
   "success": true,
   "projectFilePath": "C:\\Users\\brian\\Downloads\\app\\src\\Dinder.Contracts\\Dinder.Contracts.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\brian\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512"
+    "C:\\Users\\brian\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
+    "C:\\Users\\brian\\.nuget\\packages\\nettopologysuite\\2.6.0\\nettopologysuite.2.6.0.nupkg.sha512"
   ],
   "logs": []
 }

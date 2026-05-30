@@ -9,6 +9,7 @@ public sealed class User
     public Email Email { get; private set; }
     public string PasswordHash { get; private set; }
     public AccountStatus Status { get; private set; }
+    public DateOnly? Birthday { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? SoftDeletedAt { get; private set; }
     public string? BanReason { get; private set; }
@@ -23,11 +24,12 @@ public sealed class User
     private User() { } // EF Core
 #pragma warning restore CS8618
 
-    public User(Email email, string passwordHash)
+    public User(Email email, string passwordHash, DateOnly? birthday = null)
     {
         Id = Guid.NewGuid();
         Email = email;
         PasswordHash = passwordHash;
+        Birthday = birthday;
         Status = AccountStatus.PendingVerification;
         CreatedAt = DateTime.UtcNow;
     }
@@ -87,4 +89,16 @@ public sealed class User
     }
 
     public bool CanAuthenticate() => Status == AccountStatus.Active;
+
+    public int GetAge()
+    {
+        if (Birthday is null) return 0;
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var age = today.Year - Birthday.Value.Year;
+        if (Birthday.Value > today.AddYears(-age))
+            age--;
+        return age;
+    }
+
+    public bool IsAgeGated() => GetAge() < 18;
 }
