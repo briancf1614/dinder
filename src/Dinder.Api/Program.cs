@@ -1,5 +1,6 @@
 using Dinder.Application.Common.Behaviors;
 using Dinder.Infrastructure.Extensions;
+using Dinder.Infrastructure.SignalR;
 using FluentValidation;
 using MediatR;
 
@@ -22,6 +23,9 @@ builder.Services.AddMediatR(cfg =>
 // FluentValidation
 builder.Services.AddValidatorsFromAssembly(typeof(Dinder.Application.Identity.Commands.RegisterCommand).Assembly);
 
+// SignalR
+builder.Services.AddSignalR();
+
 // Infrastructure (DB, Auth, JWT, Repos)
 builder.Services.AddInfrastructure(builder.Configuration);
 
@@ -40,5 +44,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<Dinder.Infrastructure.Auth.TokenRevocationMiddleware>();
 app.MapControllers();
+
+// SignalR hubs
+app.MapHub<ChatHub>("/hubs/chat");
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 app.Run();

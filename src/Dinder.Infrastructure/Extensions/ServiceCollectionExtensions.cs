@@ -3,6 +3,7 @@ using Dinder.Application.Common.Interfaces;
 using Dinder.Domain.Interfaces;
 using Dinder.Infrastructure.Auth;
 using Dinder.Infrastructure.Persistence;
+using Dinder.Infrastructure.Storage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -52,6 +53,61 @@ public static class ServiceCollectionExtensions
             });
         });
 
+        services.AddDbContext<CommunicationDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.MigrationsHistoryTable(
+                    "__EFMigrationsHistory",
+                    CommunicationDbContext.CommunicationSchema);
+                npgsqlOptions.UseNetTopologySuite();
+            });
+        });
+
+        services.AddDbContext<NotificationDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.MigrationsHistoryTable(
+                    "__EFMigrationsHistory",
+                    NotificationDbContext.NotificationSchema);
+                npgsqlOptions.UseNetTopologySuite();
+            });
+        });
+
+        services.AddDbContext<ModerationDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.MigrationsHistoryTable(
+                    "__EFMigrationsHistory",
+                    ModerationDbContext.ModerationSchema);
+                npgsqlOptions.UseNetTopologySuite();
+            });
+        });
+
+        services.AddDbContext<AdminDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.MigrationsHistoryTable(
+                    "__EFMigrationsHistory",
+                    AdminDbContext.AdminSchema);
+                npgsqlOptions.UseNetTopologySuite();
+            });
+        });
+
+        services.AddDbContext<MediaDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.MigrationsHistoryTable(
+                    "__EFMigrationsHistory",
+                    MediaDbContext.MediaSchema);
+                npgsqlOptions.UseNetTopologySuite();
+            });
+        });
+
         // Auth
         var jwtSecret = configuration["Jwt:Secret"]
             ?? throw new InvalidOperationException("JWT secret not configured.");
@@ -76,6 +132,23 @@ public static class ServiceCollectionExtensions
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
                 ClockSkew = TimeSpan.Zero // No clock skew — exact 15-min expiry
             };
+
+            // Enable JWT auth for SignalR via query string
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path;
+
+                    if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                    {
+                        context.Token = accessToken;
+                    }
+
+                    return Task.CompletedTask;
+                }
+            };
         });
 
         services.AddAuthorization();
@@ -84,8 +157,16 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IProfileRepository, ProfileRepository>();
         services.AddScoped<IDiscoveryRepository, DiscoveryRepository>();
+        services.AddScoped<IChatRepository, ChatRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<IModerationRepository, ModerationRepository>();
+        services.AddScoped<IAdminRepository, AdminRepository>();
+        services.AddScoped<IMediaRepository, MediaRepository>();
         services.AddSingleton<IJwtService, JwtService>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
+
+        // Blob storage
+        services.AddSingleton<IBlobStorageService, AzureBlobStorageService>();
 
         return services;
     }

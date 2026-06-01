@@ -1,4 +1,5 @@
 using Dinder.Domain.Entities;
+using Dinder.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,11 +16,22 @@ public sealed class ConversationConfiguration : IEntityTypeConfiguration<Convers
         builder.Property(x => x.MatchId)
             .IsRequired();
 
+        builder.Property(x => x.Status)
+            .HasConversion<string>()
+            .HasMaxLength(16)
+            .IsRequired();
+
+        builder.Property(x => x.UnmatchedByUserId);
+
+        builder.Property(x => x.UnmatchedAt);
+
         builder.Property(x => x.CreatedAt)
             .IsRequired();
 
         builder.HasIndex(x => x.MatchId)
             .IsUnique();
+
+        builder.HasIndex(x => x.Status);
 
         builder.HasOne(x => x.Match)
             .WithOne(x => x.Conversation)
