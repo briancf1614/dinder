@@ -60,10 +60,16 @@ public sealed class DiscoveryController : ControllerBase
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SWIPE_LIMIT_REACHED"))
         {
             var parts = ex.Message.Split(':');
+            var resetAt = parts.Length > 1 ? parts[1] : null;
+            var upgradeTier = parts.Length > 2 ? parts[2] : null;
             return StatusCode(429, new
             {
-                error = "Daily swipe limit reached. Try again after midnight UTC.",
-                resetAt = parts.Length > 1 ? parts[1] : null
+                error = "Daily swipe limit reached. Upgrade to continue swiping.",
+                resetAt,
+                upgrade_url = upgradeTier is not null
+                    ? $"/api/v1/subscription/checkout"
+                    : null,
+                upgrade_tier = upgradeTier
             });
         }
         catch (InvalidOperationException ex)
