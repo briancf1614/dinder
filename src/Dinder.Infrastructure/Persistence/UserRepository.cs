@@ -28,7 +28,7 @@ public sealed class UserRepository : IUserRepository
         return await _context.Users
             .Include(u => u.ExternalLogins)
             .Include(u => u.RefreshTokens)
-            .FirstOrDefaultAsync(u => u.Email.Value == normalized, cancellationToken);
+            .FirstOrDefaultAsync(u => EF.Property<string>(u, "Email") == normalized, cancellationToken);
     }
 
     public async Task<User?> GetByExternalLoginAsync(
@@ -61,7 +61,7 @@ public sealed class UserRepository : IUserRepository
     public async Task<bool> EmailExistsAsync(string email, CancellationToken cancellationToken = default)
     {
         var normalized = email.ToLowerInvariant();
-        return await _context.Users.AnyAsync(u => u.Email.Value == normalized, cancellationToken);
+        return await _context.Users.AnyAsync(u => EF.Property<string>(u, "Email") == normalized, cancellationToken);
     }
 
     public void Add(User user) => _context.Users.Add(user);

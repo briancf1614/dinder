@@ -51,6 +51,22 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
+// ── Auto-create database schemas for development ────────────────────────────
+using (var scope = app.Services.CreateScope())
+{
+    var sp = scope.ServiceProvider;
+    sp.GetRequiredService<Dinder.Infrastructure.Persistence.DinderDbContext>().Database.EnsureCreated();
+    sp.GetRequiredService<Dinder.Infrastructure.Persistence.ProfileDbContext>().Database.EnsureCreated();
+    sp.GetRequiredService<Dinder.Infrastructure.Persistence.DiscoveryDbContext>().Database.EnsureCreated();
+    sp.GetRequiredService<Dinder.Infrastructure.Persistence.CommunicationDbContext>().Database.EnsureCreated();
+    sp.GetRequiredService<Dinder.Infrastructure.Persistence.NotificationDbContext>().Database.EnsureCreated();
+    sp.GetRequiredService<Dinder.Infrastructure.Persistence.ModerationDbContext>().Database.EnsureCreated();
+    sp.GetRequiredService<Dinder.Infrastructure.Persistence.AdminDbContext>().Database.EnsureCreated();
+    sp.GetRequiredService<Dinder.Infrastructure.Persistence.MediaDbContext>().Database.EnsureCreated();
+    sp.GetRequiredService<Dinder.Infrastructure.Persistence.SubscriptionDbContext>().Database.EnsureCreated();
+    sp.GetRequiredService<Dinder.Infrastructure.Persistence.AnalyticsDbContext>().Database.EnsureCreated();
+}
+
 // ── Middleware Pipeline ─────────────────────────────────────────────────────
 
 // Raw body buffering for Stripe webhook signature verification

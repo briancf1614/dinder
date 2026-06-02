@@ -119,6 +119,7 @@ public static class ServiceCollectionExtensions
                 npgsqlOptions.MigrationsHistoryTable(
                     "__EFMigrationsHistory",
                     SubscriptionDbContext.SubscriptionSchema);
+                npgsqlOptions.UseNetTopologySuite();
             });
         });
 
@@ -129,6 +130,7 @@ public static class ServiceCollectionExtensions
                 npgsqlOptions.MigrationsHistoryTable(
                     "__EFMigrationsHistory",
                     AnalyticsDbContext.AnalyticsSchema);
+                npgsqlOptions.UseNetTopologySuite();
             });
         });
 
