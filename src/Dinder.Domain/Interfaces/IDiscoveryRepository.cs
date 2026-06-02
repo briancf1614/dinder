@@ -9,8 +9,15 @@ public interface IDiscoveryRepository
     Task<Swipe?> GetSwipeAsync(Guid swiperId, Guid swipedId, CancellationToken cancellationToken = default);
     void AddSwipe(Swipe swipe);
     void UpdateSwipe(Swipe swipe);
+    void RemoveSwipe(Swipe swipe);
     Task<int> GetDailySwipeCountAsync(Guid swiperId, CancellationToken cancellationToken = default);
     Task<bool> HasSwipedAsync(Guid swiperId, Guid swipedId, CancellationToken cancellationToken = default);
+
+    // Undo
+    Task<Swipe?> GetLastSwipeAsync(Guid userId, CancellationToken cancellationToken = default);
+
+    // Likes (who right-swiped the user)
+    Task<List<Swipe>> GetLikesForUserAsync(Guid userId, CancellationToken cancellationToken = default);
 
     // Matches
     Task<Match?> GetMatchAsync(Guid userId1, Guid userId2, CancellationToken cancellationToken = default);

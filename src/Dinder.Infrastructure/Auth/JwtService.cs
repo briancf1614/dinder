@@ -25,14 +25,19 @@ public sealed class JwtService : IJwtService
         _audience = _configuration["Jwt:Audience"] ?? "Dinder.App";
     }
 
-    public string GenerateAccessToken(Guid userId, string email)
+    public string GenerateAccessToken(Guid userId, string email, string? tier = null)
     {
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
+
+        if (!string.IsNullOrWhiteSpace(tier))
+        {
+            claims.Add(new Claim("tier", tier));
+        }
 
         var token = new JwtSecurityToken(
             issuer: _issuer,
@@ -52,9 +57,9 @@ public sealed class JwtService : IJwtService
         return Convert.ToBase64String(randomBytes);
     }
 
-    public (string accessToken, string refreshToken) GenerateTokenPair(Guid userId, string email)
+    public (string accessToken, string refreshToken) GenerateTokenPair(Guid userId, string email, string? tier = null)
     {
-        var accessToken = GenerateAccessToken(userId, email);
+        var accessToken = GenerateAccessToken(userId, email, tier);
         var refreshToken = GenerateRefreshToken();
         return (accessToken, refreshToken);
     }

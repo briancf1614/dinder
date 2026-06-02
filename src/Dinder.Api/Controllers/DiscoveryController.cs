@@ -60,10 +60,16 @@ public sealed class DiscoveryController : ControllerBase
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SWIPE_LIMIT_REACHED"))
         {
             var parts = ex.Message.Split(':');
+            var resetAt = parts.Length > 1 ? parts[1] : null;
+            var upgradeTier = parts.Length > 2 ? parts[2] : null;
             return StatusCode(429, new
             {
-                error = "Daily swipe limit reached. Try again after midnight UTC.",
-                resetAt = parts.Length > 1 ? parts[1] : null
+                error = "Daily swipe limit reached. Upgrade to continue swiping.",
+                resetAt,
+                upgrade_url = upgradeTier is not null
+                    ? $"/api/v1/subscription/checkout"
+                    : null,
+                upgrade_tier = upgradeTier
             });
         }
         catch (InvalidOperationException ex)
@@ -86,6 +92,42 @@ public sealed class DiscoveryController : ControllerBase
 
         var result = await _mediator.Send(new GetMatchesQuery(userId.Value));
         return Ok(result);
+    }
+
+    /// <summary>Undo last swipe (Plus+).</summary>
+    [HttpPost("undo")]
+    public async Task<IActionResult> UndoSwipe()
+    {
+        var userId = GetUserId();
+        if (userId is null)
+            return Unauthorized();
+
+        var result = await _mediator.Send(new UndoSwipeCommand(userId.Value));
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    /// <summary>See who liked you (Plus+).</summary>
+    [HttpGet("likes")]
+    public async Task<IActionResult> GetLikes()
+    {
+        var userId = GetUserId();
+        if (userId is null)
+            return Unauthorized();
+
+        var result = await _mediator.Send(new GetLikesQuery(userId.Value));
+        return Ok(result);
+    }
+
+    /// <summary>Boost profile to top of results (Premium, 1/month).</summary>
+    [HttpPost("boost")]
+    public async Task<IActionResult> Boost()
+    {
+        var userId = GetUserId();
+        if (userId is null)
+            return Unauthorized();
+
+        var result = await _mediator.Send(new BoostCommand(userId.Value));
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     private Guid? GetUserId()

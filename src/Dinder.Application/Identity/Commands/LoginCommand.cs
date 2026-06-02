@@ -33,7 +33,7 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
         if (!_passwordHasher.Verify(request.Password, user.PasswordHash))
             throw new UnauthorizedAccessException("Invalid email or password.");
 
-        var (accessToken, refreshToken) = _jwtService.GenerateTokenPair(user.Id, user.Email);
+        var (accessToken, refreshToken) = _jwtService.GenerateTokenPair(user.Id, user.Email, tier: user.Tier.ToString());
         user.AddRefreshToken(refreshToken, DateTime.UtcNow.AddDays(30));
 
         await _userRepository.SaveChangesAsync(cancellationToken);

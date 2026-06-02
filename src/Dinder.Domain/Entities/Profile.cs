@@ -15,6 +15,7 @@ public sealed class Profile
     public Point? Location { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
+    public DateTime? BoostedAt { get; private set; }
 
     private readonly List<ProfilePhoto> _photos = [];
     public IReadOnlyCollection<ProfilePhoto> Photos => _photos.AsReadOnly();
@@ -89,6 +90,25 @@ public sealed class Profile
         IsDiscoverable = !string.IsNullOrWhiteSpace(Bio) 
                          && Preference is not null 
                          && _photos.Count > 0;
+    }
+
+    /// <summary>
+    /// Bumps the profile to the top of candidate results and records the boost timestamp.
+    /// Returns false if the profile was already boosted this calendar month.
+    /// </summary>
+    public bool Boost()
+    {
+        var now = DateTime.UtcNow;
+        if (BoostedAt.HasValue
+            && BoostedAt.Value.Year == now.Year
+            && BoostedAt.Value.Month == now.Month)
+        {
+            return false;
+        }
+
+        BoostedAt = now;
+        UpdatedAt = now;
+        return true;
     }
 
     public int GetAge()

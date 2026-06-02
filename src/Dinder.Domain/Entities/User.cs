@@ -9,6 +9,8 @@ public sealed class User
     public Email Email { get; private set; }
     public string PasswordHash { get; private set; }
     public AccountStatus Status { get; private set; }
+    public SubscriptionTier Tier { get; private set; } = SubscriptionTier.Free;
+    public string? StripeCustomerId { get; private set; }
     public DateOnly? Birthday { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? SoftDeletedAt { get; private set; }
@@ -86,6 +88,16 @@ public sealed class User
     {
         Status = AccountStatus.Active;
         BanReason = null;
+    }
+
+    public void SetTier(SubscriptionTier tier)
+    {
+        Tier = tier;
+    }
+
+    public void SetStripeCustomerId(string customerId)
+    {
+        StripeCustomerId = customerId;
     }
 
     public bool CanAuthenticate() => Status == AccountStatus.Active;
