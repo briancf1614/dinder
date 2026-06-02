@@ -24,5 +24,18 @@ docker-compose.override.yml
 Thumbs.db
 .DS_Store
 
+# Android / Kotlin
+mobile/.gradle/
+mobile/build/
+mobile/app/build/
+mobile/local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+*.log
+gen/
+
 # OpenSpec (keep the directory, but not tracking artifacts)
 openspec/project.md
