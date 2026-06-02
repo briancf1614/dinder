@@ -19,8 +19,8 @@ public sealed class RegisterCommandValidator : AbstractValidator<RegisterCommand
             .Matches(@"[0-9]").WithMessage("Password must contain at least one digit.");
 
         RuleFor(x => x.Birthday)
-            .Must(b => b.HasValue).WithMessage("Birthday is required.")
-            .Must(b => IsAtLeast18(b!.Value)).WithMessage("You must be at least 18 years old to register.");
+            .Must(b => !b.HasValue || IsAtLeast18(b.Value))
+            .WithMessage("You must be at least 18 years old to register.");
     }
 
     private static bool IsAtLeast18(DateOnly birthday)

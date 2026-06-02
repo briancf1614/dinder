@@ -2,12 +2,20 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-    path: 'profile/edit',
-    loadComponent: () => import('./features/profile/prompt-picker.component').then(m => m.PromptPickerComponent),
+    path: 'login',
+    loadComponent: () => import('./features/auth/login.page').then(m => m.LoginPageComponent),
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('./features/auth/register.page').then(m => m.RegisterPageComponent),
   },
   {
     path: 'discovery',
-    loadComponent: () => import('./features/discovery/discovery-card.component').then(m => m.DiscoveryCardComponent),
+    loadComponent: () => import('./features/discovery/discovery.page').then(m => m.DiscoveryPageComponent),
+  },
+  {
+    path: 'profile/edit',
+    loadComponent: () => import('./features/profile/profile.page').then(m => m.ProfilePageComponent),
   },
   {
     path: 'chat/:conversationId',
@@ -22,4 +30,5 @@ export const routes: Routes = [
     loadComponent: () => import('./features/moderation/report-form.component').then(m => m.ReportFormComponent),
   },
   { path: '', redirectTo: '/discovery', pathMatch: 'full' },
+  { path: '**', redirectTo: '/discovery' },
 ];
