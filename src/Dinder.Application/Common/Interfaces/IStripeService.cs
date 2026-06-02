@@ -1,4 +1,5 @@
 using Dinder.Application.Common.Models;
+using Dinder.Domain.Enums;
 
 namespace Dinder.Application.Common.Interfaces;
 
@@ -8,6 +9,7 @@ public interface IStripeService
         Guid userId,
         string email,
         string priceId,
+        SubscriptionTier tier,
         string successUrl,
         string cancelUrl,
         CancellationToken cancellationToken = default);

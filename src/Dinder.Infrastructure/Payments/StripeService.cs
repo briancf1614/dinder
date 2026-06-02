@@ -1,5 +1,6 @@
 using Dinder.Application.Common.Interfaces;
 using Dinder.Application.Common.Models;
+using Dinder.Domain.Enums;
 using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Checkout;
@@ -20,6 +21,7 @@ public sealed class StripeService : IStripeService
         Guid userId,
         string email,
         string priceId,
+        SubscriptionTier tier,
         string successUrl,
         string cancelUrl,
         CancellationToken cancellationToken = default)
@@ -39,6 +41,7 @@ public sealed class StripeService : IStripeService
             Metadata = new Dictionary<string, string>
             {
                 { "user_id", userId.ToString() },
+                { "tier", tier.ToString() },
             },
             SuccessUrl = successUrl,
             CancelUrl = cancelUrl,
@@ -72,23 +75,68 @@ public sealed class StripeService : IStripeService
             stripeSignatureHeader,
             _config.WebhookSecret);
 
-        return new StripeWebhookEvent
+        var webhookEvent = new StripeWebhookEvent
         {
             Id = stripeEvent.Id,
             Type = stripeEvent.Type,
             Created = stripeEvent.Created,
-            SubscriptionId = stripeEvent.Data.Object switch
-            {
-                Stripe.Subscription sub => sub.Id,
-                Stripe.Checkout.Session session => session.SubscriptionId,
-                _ => null,
-            },
-            CustomerId = stripeEvent.Data.Object switch
-            {
-                Stripe.Subscription sub => sub.CustomerId,
-                Stripe.Checkout.Session session => session.CustomerId,
-                _ => null,
-            },
         };
+
+        switch (stripeEvent.Data.Object)
+        {
+            case Stripe.Checkout.Session session:
+                webhookEvent = webhookEvent with
+                {
+                    SubscriptionId = session.SubscriptionId,
+                    CustomerId = session.CustomerId,
+                    UserId = TryParseUserId(session.Metadata),
+                    Tier = TryParseTier(session.Metadata),
+                };
+                break;
+
+            case Stripe.Subscription sub:
+                webhookEvent = webhookEvent with
+                {
+                    SubscriptionId = sub.Id,
+                    CustomerId = sub.CustomerId,
+                    CurrentPeriodEnd = sub.CurrentPeriodEnd,
+                    Tier = ResolveTierFromSubscription(sub),
+                };
+                break;
+        }
+
+        return webhookEvent;
+    }
+
+    private static Guid? TryParseUserId(Dictionary<string, string> metadata)
+    {
+        if (metadata.TryGetValue("user_id", out var userIdStr)
+            && Guid.TryParse(userIdStr, out var userId))
+        {
+            return userId;
+        }
+        return null;
+    }
+
+    private static SubscriptionTier? TryParseTier(Dictionary<string, string> metadata)
+    {
+        if (metadata.TryGetValue("tier", out var tierStr)
+            && Enum.TryParse<SubscriptionTier>(tierStr, out var tier))
+        {
+            return tier;
+        }
+        return null;
+    }
+
+    private SubscriptionTier? ResolveTierFromSubscription(Stripe.Subscription sub)
+    {
+        foreach (var item in sub.Items.Data)
+        {
+            if (item.Price.Id == _config.Prices.Plus)
+                return SubscriptionTier.Plus;
+            if (item.Price.Id == _config.Prices.Premium)
+                return SubscriptionTier.Premium;
+        }
+        return null;
     }
 }

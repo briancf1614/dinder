@@ -180,6 +180,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IJwtService, JwtService>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<IStripeService, StripeService>();
+        services.AddSingleton<IStripePriceResolver, StripePriceResolver>();
 
         // Blob storage
         services.AddSingleton<IBlobStorageService, AzureBlobStorageService>();
