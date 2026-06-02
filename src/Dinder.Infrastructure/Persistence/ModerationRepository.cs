@@ -28,11 +28,13 @@ public sealed class ModerationRepository : IModerationRepository
             .AnyAsync(r => r.ReporterId == reporterId && r.ReportedUserId == reportedUserId, cancellationToken);
     }
 
-    public async Task<List<Report>> GetReportsAsync(ReportStatus? status, CancellationToken cancellationToken = default)
+    public async Task<List<Report>> GetReportsAsync(ReportStatus? status, string? subCategory = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Reports.AsQueryable();
         if (status.HasValue)
             query = query.Where(r => r.Status == status.Value);
+        if (!string.IsNullOrWhiteSpace(subCategory))
+            query = query.Where(r => r.SubCategory == subCategory);
 
         return await query
             .OrderBy(r => r.CreatedAt)
@@ -75,6 +77,12 @@ public sealed class ModerationRepository : IModerationRepository
     {
         return await _context.PhotoReviews
             .FirstOrDefaultAsync(pr => pr.Id == id, cancellationToken);
+    }
+
+    public async Task<PhotoReview?> GetPhotoReviewByMediaFileAsync(Guid mediaFileId, CancellationToken cancellationToken = default)
+    {
+        return await _context.PhotoReviews
+            .FirstOrDefaultAsync(pr => pr.MediaFileId == mediaFileId, cancellationToken);
     }
 
     public async Task<List<PhotoReview>> GetPendingPhotoReviewsAsync(CancellationToken cancellationToken = default)

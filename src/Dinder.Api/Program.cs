@@ -36,6 +36,11 @@ builder.Services.AddSingleton(new SubscriptionFeatureFlags
     EnableSubscriptions = builder.Configuration.GetValue<bool>("Features:EnableSubscriptions"),
 });
 
+builder.Services.AddSingleton(new AiModerationFeatureFlags
+{
+    UseAIModeration = builder.Configuration.GetValue<bool>("Azure:UseAIModeration"),
+});
+
 // Infrastructure (DB, Auth, JWT, Repos, Stripe)
 builder.Services.AddInfrastructure(builder.Configuration);
 
@@ -79,4 +84,9 @@ app.Run();
 public sealed class SubscriptionFeatureFlags
 {
     public bool EnableSubscriptions { get; init; }
+}
+
+public sealed class AiModerationFeatureFlags
+{
+    public bool UseAIModeration { get; init; }
 }

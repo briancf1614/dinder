@@ -105,7 +105,12 @@ public sealed class SwipeCommandHandler : IRequestHandler<SwipeCommand, SwipeRes
 
         await _discoveryRepository.SaveChangesAsync(cancellationToken);
 
-        // ── Publish domain event if match was created ─────────────────
+        // ── Publish domain events ─────────────────────────────────────
+        // Analytics: track every swipe (fire-and-forget)
+        await _mediator.Publish(
+            new SwipeRecordedEvent(Guid.NewGuid(), request.SwiperId, request.SwipedId, request.Direction.ToString()),
+            cancellationToken);
+
         if (match is not null)
         {
             await _mediator.Publish(

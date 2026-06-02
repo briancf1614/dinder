@@ -71,6 +71,13 @@ public sealed class ChatRepository : IChatRepository
             .FirstOrDefaultAsync(c => c.Id == conversationId, cancellationToken);
     }
 
+    public async Task<Conversation?> GetConversationByMatchIdAsync(Guid matchId, CancellationToken cancellationToken = default)
+    {
+        return await _discoveryContext.Conversations
+            .Include(c => c.Match)
+            .FirstOrDefaultAsync(c => c.MatchId == matchId, cancellationToken);
+    }
+
     public async Task<bool> IsParticipantAsync(Guid conversationId, Guid userId, CancellationToken cancellationToken = default)
     {
         var conversation = await _discoveryContext.Conversations

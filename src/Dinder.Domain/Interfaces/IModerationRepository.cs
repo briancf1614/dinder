@@ -8,7 +8,7 @@ public interface IModerationRepository
     // Reports
     Task<Report?> GetReportAsync(Guid id, CancellationToken cancellationToken = default);
     Task<bool> HasReportedAsync(Guid reporterId, Guid reportedUserId, CancellationToken cancellationToken = default);
-    Task<List<Report>> GetReportsAsync(ReportStatus? status, CancellationToken cancellationToken = default);
+    Task<List<Report>> GetReportsAsync(ReportStatus? status, string? subCategory = null, CancellationToken cancellationToken = default);
     void AddReport(Report report);
 
     // Blocks
@@ -18,11 +18,12 @@ public interface IModerationRepository
     void AddBlock(Block block);
     void RemoveBlock(Block block);
 
-    // Photo Reviews
-    Task<PhotoReview?> GetPhotoReviewAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<List<PhotoReview>> GetPendingPhotoReviewsAsync(CancellationToken cancellationToken = default);
-    void AddPhotoReview(PhotoReview review);
-    void UpdatePhotoReview(PhotoReview review);
+        // Photo Reviews
+        Task<PhotoReview?> GetPhotoReviewAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<PhotoReview?> GetPhotoReviewByMediaFileAsync(Guid mediaFileId, CancellationToken cancellationToken = default);
+        Task<List<PhotoReview>> GetPendingPhotoReviewsAsync(CancellationToken cancellationToken = default);
+        void AddPhotoReview(PhotoReview review);
+        void UpdatePhotoReview(PhotoReview review);
 
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

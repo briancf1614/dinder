@@ -49,6 +49,8 @@ public sealed class GetProfileQueryHandler : IRequestHandler<GetProfileQuery, Pr
             profile.IsDiscoverable,
             profile.Location?.Y,
             profile.Location?.X,
-            profile.Photos.Count);
+            profile.Photos.Count,
+            profile.Prompts.Select(p =>
+                new ProfilePromptResultDto(p.PromptId, p.Answer, p.Order)).ToList());
     }
 }
