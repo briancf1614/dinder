@@ -15,6 +15,8 @@ public sealed class User
     public DateTime CreatedAt { get; private set; }
     public DateTime? SoftDeletedAt { get; private set; }
     public string? BanReason { get; private set; }
+    public int DailyStreak { get; private set; }
+    public DateTime? LastStreakDate { get; private set; }
 
     private readonly List<UserExternalLogin> _externalLogins = [];
     public IReadOnlyCollection<UserExternalLogin> ExternalLogins => _externalLogins.AsReadOnly();
@@ -113,4 +115,14 @@ public sealed class User
     }
 
     public bool IsAgeGated() => GetAge() < 18;
+
+    public void UpdateStreak(DateTime streakDate, bool increment)
+    {
+        if (increment)
+            DailyStreak++;
+        else
+            DailyStreak = 1; // Reset on missed day
+
+        LastStreakDate = streakDate;
+    }
 }
