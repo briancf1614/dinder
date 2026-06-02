@@ -1,3 +1,4 @@
+using Dinder.Application.Gamification;
 using Dinder.Application.Gamification.Handlers;
 using Dinder.Domain.Entities;
 using Dinder.Domain.Enums;
@@ -16,6 +17,7 @@ public class AchievementHandlerTests
     private readonly Mock<IDiscoveryRepository> _discoveryRepoMock;
     private readonly Mock<IChatRepository> _chatRepoMock;
     private readonly Mock<IAchievementRegistry> _achievementRegistryMock;
+    private readonly Mock<IAchievementPushService> _pushServiceMock;
     private readonly Mock<IMediator> _mediatorMock;
     private readonly Mock<ILogger<AchievementHandler>> _loggerMock;
 
@@ -25,6 +27,7 @@ public class AchievementHandlerTests
         _discoveryRepoMock = new Mock<IDiscoveryRepository>();
         _chatRepoMock = new Mock<IChatRepository>();
         _achievementRegistryMock = new Mock<IAchievementRegistry>();
+        _pushServiceMock = new Mock<IAchievementPushService>();
         _mediatorMock = new Mock<IMediator>();
         _loggerMock = new Mock<ILogger<AchievementHandler>>();
     }
@@ -122,13 +125,19 @@ public class AchievementHandlerTests
     }
 
     [Fact]
-    public async Task AchievementUnlockedEvent_PersistsToUser()
+    public async Task AchievementUnlockedEvent_PersistsToUser_AndPushesNotification()
     {
         // Arrange
         var userId = Guid.NewGuid();
         var user = CreateUser(userId);
         _userRepoMock.Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
+
+        var definition = new AchievementDefinition(
+            AchievementType.FirstMatch, "First Match",
+            "You matched with someone!", "favorite", "First MatchCreatedEvent");
+        _achievementRegistryMock.Setup(r => r.GetDefinition(AchievementType.FirstMatch))
+            .Returns(definition);
 
         var handler = CreateHandler();
         var @event = new AchievementUnlockedEvent(userId, AchievementType.FirstMatch);
@@ -140,6 +149,13 @@ public class AchievementHandlerTests
         _userRepoMock.Verify(r => r.Update(user), Times.Once);
         _userRepoMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         Assert.Contains("FirstMatch", user.Achievements);
+
+        // Assert — push notification sent
+        _pushServiceMock.Verify(p => p.PushAchievementUnlockedAsync(
+            userId,
+            It.Is<AchievementDefinition>(d => d.Type == AchievementType.FirstMatch),
+            It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Fact]
@@ -158,8 +174,73 @@ public class AchievementHandlerTests
             new AchievementUnlockedEvent(userId, AchievementType.FirstMatch),
             CancellationToken.None);
 
-        // Assert — no duplicate save
+        // Assert — no duplicate save, no push notification
         _userRepoMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+        _pushServiceMock.Verify(p => p.PushAchievementUnlockedAsync(
+            It.IsAny<Guid>(),
+            It.IsAny<AchievementDefinition>(),
+            It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task AchievementUnlockedEvent_NoDefinition_DoesNotPersistOrPush()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var user = CreateUser(userId);
+        _userRepoMock.Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        _achievementRegistryMock.Setup(r => r.GetDefinition(AchievementType.FirstMatch))
+            .Returns((AchievementDefinition?)null!);
+
+        var handler = CreateHandler();
+
+        // Act
+        await ((INotificationHandler<AchievementUnlockedEvent>)handler).Handle(
+            new AchievementUnlockedEvent(userId, AchievementType.FirstMatch),
+            CancellationToken.None);
+
+        // Assert — no persistence, no push
+        _userRepoMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+        _pushServiceMock.Verify(p => p.PushAchievementUnlockedAsync(
+            It.IsAny<Guid>(),
+            It.IsAny<AchievementDefinition>(),
+            It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task AchievementUnlockedEvent_PushServiceFails_DoesNotThrow()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var user = CreateUser(userId);
+        _userRepoMock.Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        var definition = new AchievementDefinition(
+            AchievementType.FirstMatch, "First Match",
+            "You matched!", "favorite", "criteria");
+        _achievementRegistryMock.Setup(r => r.GetDefinition(AchievementType.FirstMatch))
+            .Returns(definition);
+
+        _pushServiceMock.Setup(p => p.PushAchievementUnlockedAsync(
+            It.IsAny<Guid>(),
+            It.IsAny<AchievementDefinition>(),
+            It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new Exception("SignalR error"));
+
+        var handler = CreateHandler();
+
+        // Act — should not throw, but persistence should still happen (persistence is before push)
+        await ((INotificationHandler<AchievementUnlockedEvent>)handler).Handle(
+            new AchievementUnlockedEvent(userId, AchievementType.FirstMatch),
+            CancellationToken.None);
+
+        // Assert — user was persisted (happens before push)
+        Assert.Contains("FirstMatch", user.Achievements);
     }
 
     private static User CreateUser(Guid userId, AchievementType[]? existingAchievements = null)
@@ -168,7 +249,6 @@ public class AchievementHandlerTests
             new Dinder.Domain.ValueObjects.Email("test@test.com"),
             "hash");
 
-        // Bypass entity construction: set Id via reflection
         typeof(User).GetProperty("Id")?.SetValue(user, userId);
 
         if (existingAchievements is { Length: > 0 })
@@ -188,6 +268,7 @@ public class AchievementHandlerTests
             _discoveryRepoMock.Object,
             _chatRepoMock.Object,
             _achievementRegistryMock.Object,
+            _pushServiceMock.Object,
             _mediatorMock.Object,
             _loggerMock.Object);
     }

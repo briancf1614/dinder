@@ -11,6 +11,7 @@ namespace Dinder.Application.Gamification.Handlers;
 /// <summary>
 /// Fire-and-forget handler: evaluates achievement criteria on domain events
 /// and unlocks badges when thresholds are met. Idempotent — no re-award.
+/// Pushes real-time notifications via SignalR when an achievement is unlocked.
 /// </summary>
 public sealed class AchievementHandler
     : INotificationHandler<SwipeRecordedEvent>,
@@ -22,6 +23,7 @@ public sealed class AchievementHandler
     private readonly IDiscoveryRepository _discoveryRepository;
     private readonly IChatRepository _chatRepository;
     private readonly IAchievementRegistry _achievementRegistry;
+    private readonly IAchievementPushService _pushService;
     private readonly IMediator _mediator;
     private readonly ILogger<AchievementHandler> _logger;
 
@@ -30,6 +32,7 @@ public sealed class AchievementHandler
         IDiscoveryRepository discoveryRepository,
         IChatRepository chatRepository,
         IAchievementRegistry achievementRegistry,
+        IAchievementPushService pushService,
         IMediator mediator,
         ILogger<AchievementHandler> logger)
     {
@@ -37,6 +40,7 @@ public sealed class AchievementHandler
         _discoveryRepository = discoveryRepository;
         _chatRepository = chatRepository;
         _achievementRegistry = achievementRegistry;
+        _pushService = pushService;
         _mediator = mediator;
         _logger = logger;
     }
@@ -60,9 +64,6 @@ public sealed class AchievementHandler
             () => Task.FromResult(true), cancellationToken);
         await TryUnlockAchievement(notification.UserId2, AchievementType.FirstMatch,
             () => Task.FromResult(true), cancellationToken);
-
-        // SocialButterfly: sender gets message credit (a match creates a conversation)
-        // Achievement evaluated on message sent, not match
     }
 
     public async Task Handle(MessageSentEvent notification, CancellationToken cancellationToken)
@@ -79,7 +80,7 @@ public sealed class AchievementHandler
 
     public async Task Handle(AchievementUnlockedEvent notification, CancellationToken cancellationToken)
     {
-        // Persist the unlocked achievement to User.Achievements JSON
+        // 1. Persist to User.Achievements JSON
         try
         {
             var user = await _userRepository.GetByIdAsync(notification.UserId, cancellationToken);
@@ -91,6 +92,14 @@ public sealed class AchievementHandler
             if (achievements.Contains(achievementTypeStr))
                 return; // Already persisted — idempotent
 
+            // Look up achievement definition for push notification payload
+            var definition = _achievementRegistry.GetDefinition(notification.Type);
+            if (definition is null)
+            {
+                _logger.LogWarning("AchievementHandler: No definition found for {Type}", notification.Type);
+                return;
+            }
+
             achievements.Add(achievementTypeStr);
             user.SetAchievements(JsonSerializer.Serialize(achievements));
             _userRepository.Update(user);
@@ -99,10 +108,20 @@ public sealed class AchievementHandler
             _logger.LogInformation(
                 "AchievementHandler: Persisted {Achievement} for User {UserId}",
                 notification.Type, notification.UserId);
+
+            // 2. Push real-time notification via SignalR
+            await _pushService.PushAchievementUnlockedAsync(
+                notification.UserId,
+                definition,
+                cancellationToken);
+
+            _logger.LogInformation(
+                "AchievementHandler: Push notification sent for {Achievement} to User {UserId}",
+                notification.Type, notification.UserId);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "AchievementHandler: Failed to persist {Achievement} for User {UserId}",
+            _logger.LogError(ex, "AchievementHandler: Failed to persist/push {Achievement} for User {UserId}",
                 notification.Type, notification.UserId);
         }
     }
@@ -130,7 +149,7 @@ public sealed class AchievementHandler
             if (!await criteriaMet())
                 return;
 
-            // Fire the event — persistence happens in Handle(AchievementUnlockedEvent)
+            // Fire the event — persistence + push happens in Handle(AchievementUnlockedEvent)
             await _mediator.Publish(new AchievementUnlockedEvent(userId, type), cancellationToken);
 
             _logger.LogInformation("Achievement {Type} unlocked for User {UserId}", type, userId);

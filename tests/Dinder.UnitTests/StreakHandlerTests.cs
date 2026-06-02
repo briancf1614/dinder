@@ -26,7 +26,7 @@ public class StreakHandlerTests
     }
 
     [Fact]
-    public async Task ConsecutiveLogin_IncrementsStreak()
+    public async Task ConsecutiveSwipe_IncrementsStreak()
     {
         // Arrange
         var yesterday = DateTime.UtcNow.Date.AddDays(-1);
@@ -35,7 +35,7 @@ public class StreakHandlerTests
             .ReturnsAsync(user);
 
         var handler = CreateHandler();
-        var @event = new UserLoggedInEvent(user.Id, DateTime.UtcNow);
+        var @event = new SwipeRecordedEvent(Guid.NewGuid(), user.Id, Guid.NewGuid(), "Right");
 
         // Act
         await handler.Handle(@event, CancellationToken.None);
@@ -43,6 +43,25 @@ public class StreakHandlerTests
         // Assert
         _userRepoMock.Verify(r => r.Update(user), Times.Once);
         _userRepoMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Equal(4, user.DailyStreak);
+    }
+
+    [Fact]
+    public async Task ConsecutiveMessage_IncrementsStreak()
+    {
+        // Arrange
+        var yesterday = DateTime.UtcNow.Date.AddDays(-1);
+        var user = CreateUser(streak: 3, lastStreakDate: yesterday);
+        _userRepoMock.Setup(r => r.GetByIdAsync(user.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        var handler = CreateHandler();
+        var @event = new MessageSentEvent(Guid.NewGuid(), Guid.NewGuid(), user.Id, Guid.NewGuid(), "Hello!");
+
+        // Act
+        await handler.Handle(@event, CancellationToken.None);
+
+        // Assert
         Assert.Equal(4, user.DailyStreak);
     }
 
@@ -56,7 +75,7 @@ public class StreakHandlerTests
             .ReturnsAsync(user);
 
         var handler = CreateHandler();
-        var @event = new UserLoggedInEvent(user.Id, DateTime.UtcNow);
+        var @event = new SwipeRecordedEvent(Guid.NewGuid(), user.Id, Guid.NewGuid(), "Right");
 
         // Act
         await handler.Handle(@event, CancellationToken.None);
@@ -66,22 +85,62 @@ public class StreakHandlerTests
     }
 
     [Fact]
-    public async Task LoginOnly_SameDay_DoesNotIncrement()
+    public async Task LoginOnly_NoAction_DoesNotCount()
     {
+        // StreakHandler no longer subscribes to UserLoggedInEvent.
+        // The streak only increments on SwipeRecordedEvent or MessageSentEvent.
+        // This test verifies that without a meaningful action (swipe or message),
+        // no streak increment occurs — the handler simply doesn't process login events.
+
         // Arrange
+        var yesterday = DateTime.UtcNow.Date.AddDays(-1);
+        var user = CreateUser(streak: 3, lastStreakDate: yesterday);
+        _userRepoMock.Setup(r => r.GetByIdAsync(user.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        // Act — no event published (simulating login without action)
+        // The handler does not subscribe to UserLoggedInEvent, so nothing happens.
+
+        // Assert — user's streak unchanged
+        Assert.Equal(3, user.DailyStreak);
+    }
+
+    [Fact]
+    public async Task SameDayAction_OnlyCountsOnce()
+    {
+        // Arrange — user already had a swipe earlier today
         var today = DateTime.UtcNow;
         var user = CreateUser(streak: 3, lastStreakDate: today);
         _userRepoMock.Setup(r => r.GetByIdAsync(user.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
         var handler = CreateHandler();
-        var @event = new UserLoggedInEvent(user.Id, today);
+        var @event = new SwipeRecordedEvent(Guid.NewGuid(), user.Id, Guid.NewGuid(), "Right");
 
         // Act
         await handler.Handle(@event, CancellationToken.None);
 
         // Assert
         Assert.Equal(3, user.DailyStreak); // No change — already processed today
+    }
+
+    [Fact]
+    public async Task SwipeAndMessage_SameDay_OnlyCountsOnce()
+    {
+        // Arrange — first action today already counted
+        var today = DateTime.UtcNow;
+        var user = CreateUser(streak: 5, lastStreakDate: today);
+        _userRepoMock.Setup(r => r.GetByIdAsync(user.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        var handler = CreateHandler();
+        var messageEvent = new MessageSentEvent(Guid.NewGuid(), Guid.NewGuid(), user.Id, Guid.NewGuid(), "Hi");
+
+        // Act — message sent same day after a swipe was already counted
+        await handler.Handle(messageEvent, CancellationToken.None);
+
+        // Assert — no double-count
+        Assert.Equal(5, user.DailyStreak);
     }
 
     [Fact]
@@ -94,7 +153,7 @@ public class StreakHandlerTests
             .ReturnsAsync(user);
 
         var handler = CreateHandler();
-        var @event = new UserLoggedInEvent(user.Id, DateTime.UtcNow);
+        var @event = new SwipeRecordedEvent(Guid.NewGuid(), user.Id, Guid.NewGuid(), "Right");
 
         // Act
         await handler.Handle(@event, CancellationToken.None);
@@ -117,7 +176,7 @@ public class StreakHandlerTests
             .ReturnsAsync(user);
 
         var handler = CreateHandler();
-        var @event = new UserLoggedInEvent(user.Id, DateTime.UtcNow);
+        var @event = new MessageSentEvent(Guid.NewGuid(), Guid.NewGuid(), user.Id, Guid.NewGuid(), "Hi");
 
         // Act
         await handler.Handle(@event, CancellationToken.None);
@@ -135,7 +194,7 @@ public class StreakHandlerTests
             .ReturnsAsync((User?)null);
 
         var handler = CreateHandler();
-        var @event = new UserLoggedInEvent(userId, DateTime.UtcNow);
+        var @event = new SwipeRecordedEvent(Guid.NewGuid(), userId, Guid.NewGuid(), "Right");
 
         // Act
         await handler.Handle(@event, CancellationToken.None);
@@ -152,7 +211,7 @@ public class StreakHandlerTests
             .ThrowsAsync(new Exception("DB error"));
 
         var handler = CreateHandler();
-        var @event = new UserLoggedInEvent(Guid.NewGuid(), DateTime.UtcNow);
+        var @event = new SwipeRecordedEvent(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Right");
 
         // Act — should not throw (fire-and-forget)
         await handler.Handle(@event, CancellationToken.None);
@@ -162,7 +221,7 @@ public class StreakHandlerTests
     }
 
     [Fact]
-    public async Task FirstLoginEver_InitializesStreakTo1()
+    public async Task FirstActionEver_InitializesStreakTo1()
     {
         // Arrange
         var user = CreateUser(streak: 0, lastStreakDate: null);
@@ -170,7 +229,7 @@ public class StreakHandlerTests
             .ReturnsAsync(user);
 
         var handler = CreateHandler();
-        var @event = new UserLoggedInEvent(user.Id, DateTime.UtcNow);
+        var @event = new SwipeRecordedEvent(Guid.NewGuid(), user.Id, Guid.NewGuid(), "Right");
 
         // Act
         await handler.Handle(@event, CancellationToken.None);
@@ -187,8 +246,6 @@ public class StreakHandlerTests
 
         if (streak > 0 && lastStreakDate.HasValue)
         {
-            // Build streak backwards: start N days before the target last streak date
-            // so the final UpdateStreak call lands on lastStreakDate with the correct value.
             var startDate = lastStreakDate.Value.Date.AddDays(-(streak - 1));
             user.UpdateStreak(startDate, false); // Day 1
             for (int i = 1; i < streak; i++)

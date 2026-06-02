@@ -67,3 +67,14 @@ Chain strategy: feature-branch-chain
 - [x] 6.3 Unit test `MlNetProfileScorer` — test vectors with known profiles, cold-start fallback (DI-6)
 - [x] 6.4 Unit test `SwipeCommand` with bonus streaks — 7-day bonus accepted, 30-day cap, no-streak rejection (DI-7)
 - [x] 6.5 Extend `EntitlementBehaviorTests` — verify 403 body includes `RequiredTier` + `CurrentTier` fields (EE-2, already implemented; test-only)
+
+## Phase 7: Verification Fixes (apply-progress batch 2)
+
+- [x] 7.1 Fix GA-3: Create `ProfileUpdatedEvent`, `ProfileCompletenessCalculator`, `ProfileCompletenessHandler` — score based on photo/bio/preferences/prompts, award ProfileComplete at 100%
+- [x] 7.2 Fix GA-3: Fire `ProfileUpdatedEvent` from all profile command handlers (`CreateOrUpdateProfileCommand`, `UpdatePreferencesCommand`, `UpdateProfilePromptsCommand`, `UpdateProfileLocationCommand`)
+- [x] 7.3 Fix GA-3: Add `ProfileCompletenessScore` to `User` entity + EF mapping
+- [x] 7.4 Fix GA-5: Create `IAchievementPushService` (Application layer) + `AchievementPushService` (Infrastructure) wrapping `IHubContext<NotificationHub>`
+- [x] 7.5 Fix GA-5: Inject `IAchievementPushService` into `AchievementHandler`, push notification on persist
+- [x] 7.6 Fix GA-1: Switch `StreakHandler` from `UserLoggedInEvent` to `SwipeRecordedEvent` + `MessageSentEvent` (action-gated streak)
+- [x] 7.7 Add tests: `ProfileCompletenessCalculatorTests` (7), `ProfileCompletenessHandlerTests` (7), updated `StreakHandlerTests` (11), updated `AchievementHandlerTests` (8)
+- [x] 7.8 Verify: `dotnet test` — 238 passed (223 unit + 15 integration), 0 failed

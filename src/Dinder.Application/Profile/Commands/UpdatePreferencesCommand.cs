@@ -1,5 +1,6 @@
 using Dinder.Domain.Entities;
 using Dinder.Domain.Enums;
+using Dinder.Domain.Events;
 using Dinder.Domain.Interfaces;
 using MediatR;
 
@@ -21,10 +22,12 @@ public sealed record PreferenceResult(
 public sealed class UpdatePreferencesCommandHandler : IRequestHandler<UpdatePreferencesCommand, PreferenceResult>
 {
     private readonly IProfileRepository _profileRepository;
+    private readonly IMediator _mediator;
 
-    public UpdatePreferencesCommandHandler(IProfileRepository profileRepository)
+    public UpdatePreferencesCommandHandler(IProfileRepository profileRepository, IMediator mediator)
     {
         _profileRepository = profileRepository;
+        _mediator = mediator;
     }
 
     public async Task<PreferenceResult> Handle(UpdatePreferencesCommand request, CancellationToken cancellationToken)
@@ -53,6 +56,8 @@ public sealed class UpdatePreferencesCommandHandler : IRequestHandler<UpdatePref
 
         profile.UpdateDiscoverability();
         await _profileRepository.SaveChangesAsync(cancellationToken);
+
+        await _mediator.Publish(new ProfileUpdatedEvent(request.UserId, DateTime.UtcNow), cancellationToken);
 
         return new PreferenceResult(
             request.InterestedInGenders.Select(g => g.ToString()).ToList(),

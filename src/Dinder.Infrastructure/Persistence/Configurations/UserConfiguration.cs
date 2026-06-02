@@ -53,6 +53,10 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasDefaultValue(0);
 
+        builder.Property(x => x.ProfileCompletenessScore)
+            .IsRequired()
+            .HasDefaultValue(0);
+
         builder.Property(x => x.Achievements)
             .HasMaxLength(4000);
 

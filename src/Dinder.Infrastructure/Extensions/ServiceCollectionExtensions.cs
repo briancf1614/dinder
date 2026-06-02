@@ -6,6 +6,7 @@ using Dinder.Application.Gamification;
 using Dinder.Infrastructure.Matching;
 using Dinder.Infrastructure.Payments;
 using Dinder.Infrastructure.Persistence;
+using Dinder.Infrastructure.SignalR;
 using Dinder.Infrastructure.Storage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -206,6 +207,7 @@ public static class ServiceCollectionExtensions
         // Gamification
         services.AddSingleton<IAchievementRegistry, AchievementRegistry>();
         services.AddSingleton<IProfileScorer, MlNetProfileScorer>();
+        services.AddSingleton<IAchievementPushService, AchievementPushService>();
 
         return services;
     }

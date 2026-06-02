@@ -1,3 +1,4 @@
+using Dinder.Domain.Events;
 using Dinder.Domain.Interfaces;
 using MediatR;
 
@@ -8,10 +9,12 @@ public sealed record UpdateProfileLocationCommand(Guid UserId, double Latitude, 
 public sealed class UpdateProfileLocationCommandHandler : IRequestHandler<UpdateProfileLocationCommand>
 {
     private readonly IProfileRepository _profileRepository;
+    private readonly IMediator _mediator;
 
-    public UpdateProfileLocationCommandHandler(IProfileRepository profileRepository)
+    public UpdateProfileLocationCommandHandler(IProfileRepository profileRepository, IMediator mediator)
     {
         _profileRepository = profileRepository;
+        _mediator = mediator;
     }
 
     public async Task Handle(UpdateProfileLocationCommand request, CancellationToken cancellationToken)
@@ -21,5 +24,7 @@ public sealed class UpdateProfileLocationCommandHandler : IRequestHandler<Update
 
         profile.SetLocation(request.Latitude, request.Longitude);
         await _profileRepository.SaveChangesAsync(cancellationToken);
+
+        await _mediator.Publish(new ProfileUpdatedEvent(request.UserId, DateTime.UtcNow), cancellationToken);
     }
 }

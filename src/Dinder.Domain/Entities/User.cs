@@ -18,6 +18,7 @@ public sealed class User
     public int DailyStreak { get; private set; }
     public DateTime? LastStreakDate { get; private set; }
     public int DailyBonusSwipes { get; private set; }
+    public int ProfileCompletenessScore { get; private set; }
     public string? Achievements { get; private set; }
 
     private readonly List<UserExternalLogin> _externalLogins = [];
@@ -135,6 +136,11 @@ public sealed class User
     public void SetBonusSwipes(int bonus)
     {
         DailyBonusSwipes = bonus;
+    }
+
+    public void SetCompletenessScore(int score)
+    {
+        ProfileCompletenessScore = score;
     }
 
     public void SetAchievements(string achievementsJson)
