@@ -41,6 +41,11 @@ builder.Services.AddSingleton(new AiModerationFeatureFlags
     UseAIModeration = builder.Configuration.GetValue<bool>("Azure:UseAIModeration"),
 });
 
+builder.Services.AddSingleton(new Dinder.Application.Discovery.Queries.MatchingFeatureFlags
+{
+    UseMLScoring = builder.Configuration.GetValue<bool>("Matching:UseMLScoring"),
+});
+
 // Infrastructure (DB, Auth, JWT, Repos, Stripe)
 builder.Services.AddInfrastructure(builder.Configuration);
 

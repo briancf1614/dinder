@@ -11,6 +11,7 @@ public interface IDiscoveryRepository
     void UpdateSwipe(Swipe swipe);
     void RemoveSwipe(Swipe swipe);
     Task<int> GetDailySwipeCountAsync(Guid swiperId, CancellationToken cancellationToken = default);
+    Task<int> GetLifetimeSwipeCountAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<bool> HasSwipedAsync(Guid swiperId, Guid swipedId, CancellationToken cancellationToken = default);
 
     // Undo

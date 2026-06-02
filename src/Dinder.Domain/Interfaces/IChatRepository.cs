@@ -19,6 +19,9 @@ public interface IChatRepository
     // Unread count for notification badge
     Task<int> GetUnreadMessageCountAsync(Guid conversationId, Guid userId, CancellationToken cancellationToken = default);
 
+    // Gamification: message count for achievement evaluation
+    Task<int> GetMessageCountBySenderAsync(Guid senderId, CancellationToken cancellationToken = default);
+
     // Conversation list
     Task<List<Conversation>> GetConversationsByUserIdAsync(
         Guid userId, Guid? cursor, int limit, CancellationToken cancellationToken = default);

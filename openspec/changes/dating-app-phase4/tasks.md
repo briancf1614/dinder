@@ -49,21 +49,21 @@ Chain strategy: feature-branch-chain
 
 ## Phase 4: Gamification Handlers (PR 2)
 
-- [ ] 4.1 Create `src/Dinder.Application/Gamification/Handlers/StreakHandler.cs` — `INotificationHandler<UserLoggedInEvent>`, UTC midnight boundary, action-gated increment/reset (GA-1)
-- [ ] 4.2 Create `src/Dinder.Application/Gamification/Handlers/AchievementHandler.cs` — handles `SwipeRecordedEvent` + `MatchCreatedEvent`, counter checks, fires `AchievementUnlockedEvent`, idempotency guard (GA-2)
-- [ ] 4.3 Create `src/Dinder.Application/Gamification/Handlers/DailyRewardHandler.cs` — streak milestones (7d=+5, 14d=+10, 30d=+15), premium stacking per `[RequiresTier]` (GA-4)
+- [x] 4.1 Create `src/Dinder.Application/Gamification/Handlers/StreakHandler.cs` — `INotificationHandler<UserLoggedInEvent>`, UTC midnight boundary, action-gated increment/reset (GA-1)
+- [x] 4.2 Create `src/Dinder.Application/Gamification/Handlers/AchievementHandler.cs` — handles `SwipeRecordedEvent` + `MatchCreatedEvent`, counter checks, fires `AchievementUnlockedEvent`, idempotency guard (GA-2)
+- [x] 4.3 Create `src/Dinder.Application/Gamification/Handlers/DailyRewardHandler.cs` — streak milestones (7d=+5, 14d=+10, 30d=+15), premium stacking per `[RequiresTier]` (GA-4)
 
 ## Phase 5: ML Scoring Integration (PR 2)
 
-- [ ] 5.1 Create `src/Dinder.Infrastructure/Matching/MlNetProfileScorer.cs` — ML.NET OneHotEncoding + cosine similarity on prompts/interests/demographics, cold-start fallback (DI-6)
-- [ ] 5.2 Modify `src/Dinder.Application/Discovery/Queries/GetCandidatesQuery.cs` — inject `IProfileScorer`, gate behind `Matching:UseMLScoring` feature flag
-- [ ] 5.3 Modify `src/Dinder.Application/Discovery/Commands/SwipeCommand.cs` — query `User.DailyStreak` for bonus swipe calculation (DI-7)
-- [ ] 5.4 Register `MatchingFeatureFlags` singleton in `src/Dinder.Api/Program.cs` — default `UseMLScoring: false`
+- [x] 5.1 Create `src/Dinder.Infrastructure/Matching/MlNetProfileScorer.cs` — simple cosine similarity on prompts/interests/demographics, cold-start fallback (DI-6)
+- [x] 5.2 Modify `src/Dinder.Application/Discovery/Queries/GetCandidatesQuery.cs` — inject `IProfileScorer`, gate behind `Matching:UseMLScoring` feature flag
+- [x] 5.3 Modify `src/Dinder.Application/Discovery/Commands/SwipeCommand.cs` — query `User.DailyStreak` for bonus swipe calculation (DI-7)
+- [x] 5.4 Register `MatchingFeatureFlags` singleton in `src/Dinder.Api/Program.cs` — default `UseMLScoring: false`
 
 ## Phase 6: Gamification + ML Tests (PR 2)
 
-- [ ] 6.1 Unit test `StreakHandler` — consecutive increment, missed-day reset, login-only no-op (GA-1)
-- [ ] 6.2 Unit test `AchievementHandler` — first-match unlock, 100-swipes milestone, idempotency (GA-2)
-- [ ] 6.3 Unit test `MlNetProfileScorer` — test vectors with known profiles, cold-start fallback (DI-6)
-- [ ] 6.4 Integration test `SwipeCommand` with bonus streaks — 7-day bonus accepted, 30-day cap, no-streak rejection (DI-7)
-- [ ] 6.5 Extend `EntitlementBehaviorTests` — verify 403 body includes `RequiredTier` + `CurrentTier` fields (EE-2, already implemented; test-only)
+- [x] 6.1 Unit test `StreakHandler` — consecutive increment, missed-day reset, login-only no-op (GA-1)
+- [x] 6.2 Unit test `AchievementHandler` — first-match unlock, 100-swipes milestone, idempotency (GA-2)
+- [x] 6.3 Unit test `MlNetProfileScorer` — test vectors with known profiles, cold-start fallback (DI-6)
+- [x] 6.4 Unit test `SwipeCommand` with bonus streaks — 7-day bonus accepted, 30-day cap, no-streak rejection (DI-7)
+- [x] 6.5 Extend `EntitlementBehaviorTests` — verify 403 body includes `RequiredTier` + `CurrentTier` fields (EE-2, already implemented; test-only)

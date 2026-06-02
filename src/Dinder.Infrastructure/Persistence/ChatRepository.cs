@@ -104,6 +104,14 @@ public sealed class ChatRepository : IChatRepository
             .CountAsync(m => m.ConversationId == conversationId && m.SenderId != userId && m.ReadAt == null, cancellationToken);
     }
 
+    // ── Message count for achievements ──────────────────────────────────
+
+    public async Task<int> GetMessageCountBySenderAsync(Guid senderId, CancellationToken cancellationToken = default)
+    {
+        return await _communicationContext.Messages
+            .CountAsync(m => m.SenderId == senderId, cancellationToken);
+    }
+
     // ── Conversation list ───────────────────────────────────────────────
 
     public async Task<List<Conversation>> GetConversationsByUserIdAsync(

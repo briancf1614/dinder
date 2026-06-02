@@ -2,6 +2,8 @@ using System.Text;
 using Dinder.Application.Common.Interfaces;
 using Dinder.Domain.Interfaces;
 using Dinder.Infrastructure.Auth;
+using Dinder.Application.Gamification;
+using Dinder.Infrastructure.Matching;
 using Dinder.Infrastructure.Payments;
 using Dinder.Infrastructure.Persistence;
 using Dinder.Infrastructure.Storage;
@@ -200,6 +202,10 @@ public static class ServiceCollectionExtensions
 
         // Analytics
         services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
+
+        // Gamification
+        services.AddSingleton<IAchievementRegistry, AchievementRegistry>();
+        services.AddSingleton<IProfileScorer, MlNetProfileScorer>();
 
         return services;
     }

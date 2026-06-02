@@ -17,6 +17,8 @@ public sealed class User
     public string? BanReason { get; private set; }
     public int DailyStreak { get; private set; }
     public DateTime? LastStreakDate { get; private set; }
+    public int DailyBonusSwipes { get; private set; }
+    public string? Achievements { get; private set; }
 
     private readonly List<UserExternalLogin> _externalLogins = [];
     public IReadOnlyCollection<UserExternalLogin> ExternalLogins => _externalLogins.AsReadOnly();
@@ -123,6 +125,20 @@ public sealed class User
         else
             DailyStreak = 1; // Reset on missed day
 
+        // Cap at 30
+        if (DailyStreak > 30)
+            DailyStreak = 30;
+
         LastStreakDate = streakDate;
+    }
+
+    public void SetBonusSwipes(int bonus)
+    {
+        DailyBonusSwipes = bonus;
+    }
+
+    public void SetAchievements(string achievementsJson)
+    {
+        Achievements = achievementsJson;
     }
 }

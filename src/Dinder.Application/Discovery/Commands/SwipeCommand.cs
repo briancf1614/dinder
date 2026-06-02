@@ -19,15 +19,18 @@ public sealed class SwipeCommandHandler : IRequestHandler<SwipeCommand, SwipeRes
     private const int PremiumDailyLimit = int.MaxValue;
 
     private readonly IDiscoveryRepository _discoveryRepository;
+    private readonly IUserRepository _userRepository;
     private readonly IMediator _mediator;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public SwipeCommandHandler(
         IDiscoveryRepository discoveryRepository,
+        IUserRepository userRepository,
         IMediator mediator,
         IHttpContextAccessor httpContextAccessor)
     {
         _discoveryRepository = discoveryRepository;
+        _userRepository = userRepository;
         _mediator = mediator;
         _httpContextAccessor = httpContextAccessor;
     }
@@ -38,12 +41,18 @@ public sealed class SwipeCommandHandler : IRequestHandler<SwipeCommand, SwipeRes
         var tier = ResolveTier();
 
         // ── Determine daily limit based on tier ───────────────────────
-        var dailyLimit = tier switch
+        var baseLimit = tier switch
         {
             SubscriptionTier.Premium => PremiumDailyLimit,
             SubscriptionTier.Plus => PlusDailyLimit,
             _ => FreeDailyLimit
         };
+
+        // ── Add bonus swipes from gamification streak ──────────────────
+        var bonusSwipes = await GetBonusSwipesAsync(request.SwiperId, cancellationToken);
+        var dailyLimit = baseLimit == int.MaxValue
+            ? int.MaxValue // Premium remains unlimited
+            : baseLimit + bonusSwipes;
 
         // ── Check daily swipe limit ───────────────────────────────────
         var dailyCount = await _discoveryRepository.GetDailySwipeCountAsync(
@@ -139,5 +148,20 @@ public sealed class SwipeCommandHandler : IRequestHandler<SwipeCommand, SwipeRes
         }
 
         return tier;
+    }
+
+    private async Task<int> GetBonusSwipesAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
+        if (user is null) return 0;
+
+        // Calculate bonus from streak (capped at 30-day milestone = +15)
+        return user.DailyStreak switch
+        {
+            >= 30 => 15,
+            >= 14 => 10,
+            >= 7 => 5,
+            _ => 0
+        };
     }
 }
