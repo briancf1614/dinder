@@ -70,7 +70,7 @@ mobile:
   framework: Jetpack Compose
   language: Kotlin
   design_system: Material 3
-  status: toolchain not installed yet
+  status: verified
 
 database:
   engine: PostgreSQL
