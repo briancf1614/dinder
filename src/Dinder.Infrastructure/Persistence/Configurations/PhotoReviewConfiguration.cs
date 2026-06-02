@@ -21,6 +21,10 @@ public sealed class PhotoReviewConfiguration : IEntityTypeConfiguration<PhotoRev
         builder.Property(x => x.RejectionReason)
             .HasMaxLength(500);
 
+        builder.Property(x => x.AdultScore);
+        builder.Property(x => x.RacyScore);
+        builder.Property(x => x.ViolenceScore);
+
         builder.Property(x => x.CreatedAt)
             .IsRequired();
 

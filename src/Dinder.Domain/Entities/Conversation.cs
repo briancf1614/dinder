@@ -9,6 +9,8 @@ public sealed class Conversation
     public ConversationStatus Status { get; private set; }
     public Guid? UnmatchedByUserId { get; private set; }
     public DateTime? UnmatchedAt { get; private set; }
+    public string? IcebreakerQuestion { get; private set; }
+    public IcebreakerCategory? IcebreakerCategory { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
     // Navigation
@@ -34,6 +36,12 @@ public sealed class Conversation
     }
 
     public bool CanSendMessages() => Status == ConversationStatus.Active;
+
+    public void AssignIcebreaker(string question, IcebreakerCategory category)
+    {
+        IcebreakerQuestion = question;
+        IcebreakerCategory = category;
+    }
 
     public bool IsParticipant(Guid userId, Guid userId1, Guid userId2) =>
         userId == userId1 || userId == userId2;

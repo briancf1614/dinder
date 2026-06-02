@@ -36,6 +36,23 @@ public sealed class MediaFile
         ApprovedAt = DateTime.UtcNow;
     }
 
+    public void AutoApprove()
+    {
+        Status = MediaStatus.Approved;
+        ApprovedByAdminId = null;
+        ApprovedAt = DateTime.UtcNow;
+    }
+
+    public void SetAIScanning()
+    {
+        Status = MediaStatus.AIScanning;
+    }
+
+    public void SetFlaggedByAI()
+    {
+        Status = MediaStatus.FlaggedByAI;
+    }
+
     public void Reject()
     {
         Status = MediaStatus.Rejected;

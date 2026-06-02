@@ -9,6 +9,9 @@ public sealed class PhotoReview
     public Guid UserId { get; private set; }
     public PhotoReviewStatus Status { get; private set; }
     public string? RejectionReason { get; private set; }
+    public float? AdultScore { get; private set; }
+    public float? RacyScore { get; private set; }
+    public float? ViolenceScore { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? ReviewedAt { get; private set; }
     public Guid? ReviewedByAdminId { get; private set; }
@@ -26,11 +29,18 @@ public sealed class PhotoReview
         CreatedAt = DateTime.UtcNow;
     }
 
-    public void Approve(Guid adminId)
+    public void Approve(Guid? adminId)
     {
         Status = PhotoReviewStatus.Approved;
         ReviewedByAdminId = adminId;
         ReviewedAt = DateTime.UtcNow;
+    }
+
+    public void SetAIScores(float adultScore, float racyScore, float violenceScore)
+    {
+        AdultScore = adultScore;
+        RacyScore = racyScore;
+        ViolenceScore = violenceScore;
     }
 
     public void Reject(Guid adminId, string reason)

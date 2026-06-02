@@ -20,6 +20,9 @@ public sealed class Profile
     private readonly List<ProfilePhoto> _photos = [];
     public IReadOnlyCollection<ProfilePhoto> Photos => _photos.AsReadOnly();
 
+    private readonly List<ProfilePrompt> _prompts = [];
+    public IReadOnlyCollection<ProfilePrompt> Prompts => _prompts.AsReadOnly();
+
     public ProfilePreference? Preference { get; private set; }
 
 #pragma warning disable CS8618
@@ -73,6 +76,24 @@ public sealed class Profile
             var photo = _photos.FirstOrDefault(p => p.Id == photoIds[i]);
             if (photo is not null)
                 photo.SetOrder(i);
+        }
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void SetPrompts(IEnumerable<ProfilePrompt> prompts)
+    {
+        _prompts.Clear();
+        _prompts.AddRange(prompts);
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void ReorderPrompts(List<Guid> promptIds)
+    {
+        for (int i = 0; i < promptIds.Count; i++)
+        {
+            var prompt = _prompts.FirstOrDefault(p => p.PromptId == promptIds[i]);
+            if (prompt is not null)
+                prompt.SetOrder(i);
         }
         UpdatedAt = DateTime.UtcNow;
     }

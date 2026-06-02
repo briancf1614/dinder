@@ -119,6 +119,16 @@ public static class ServiceCollectionExtensions
             });
         });
 
+        services.AddDbContext<AnalyticsDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.MigrationsHistoryTable(
+                    "__EFMigrationsHistory",
+                    AnalyticsDbContext.AnalyticsSchema);
+            });
+        });
+
         // Stripe
         services.Configure<StripeConfiguration>(configuration.GetSection(StripeConfiguration.SectionName));
 
@@ -184,6 +194,12 @@ public static class ServiceCollectionExtensions
 
         // Blob storage
         services.AddSingleton<IBlobStorageService, AzureBlobStorageService>();
+
+        // AI moderation
+        services.AddSingleton<IAzureVisionService, AzureVisionService>();
+
+        // Analytics
+        services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
 
         return services;
     }

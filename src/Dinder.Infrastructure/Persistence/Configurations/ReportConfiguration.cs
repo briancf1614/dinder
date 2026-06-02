@@ -26,6 +26,9 @@ public sealed class ReportConfiguration : IEntityTypeConfiguration<Report>
         builder.Property(x => x.Description)
             .HasMaxLength(1000);
 
+        builder.Property(x => x.SubCategory)
+            .HasMaxLength(32);
+
         builder.Property(x => x.ResolutionNote)
             .HasMaxLength(500);
 

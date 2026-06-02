@@ -33,7 +33,7 @@ public class ModerationHandlerTests
         var handler = new ReportUserCommandHandler(moderationRepoMock.Object, userRepoMock.Object, logger);
 
         // Act
-        var result = await handler.Handle(new ReportUserCommand(reporterId, reportedUserId, reason, "Bad behavior"), CancellationToken.None);
+        var result = await handler.Handle(new ReportUserCommand(reporterId, reportedUserId, reason, null, "Bad behavior"), CancellationToken.None);
 
         // Assert
         Assert.NotEqual(Guid.Empty, result.ReportId);
@@ -52,7 +52,7 @@ public class ModerationHandlerTests
         var handler = new ReportUserCommandHandler(moderationRepoMock.Object, userRepoMock.Object, logger);
 
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            handler.Handle(new ReportUserCommand(userId, userId, ReportReason.Spam, "I'm bad"), CancellationToken.None));
+            handler.Handle(new ReportUserCommand(userId, userId, ReportReason.Spam, null, "I'm bad"), CancellationToken.None));
 
         Assert.Contains("yourself", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -77,7 +77,7 @@ public class ModerationHandlerTests
         var handler = new ReportUserCommandHandler(moderationRepoMock.Object, userRepoMock.Object, logger);
 
         var result = await handler.Handle(
-            new ReportUserCommand(reporterId, reportedUserId, ReportReason.Harassment, "Second report"),
+            new ReportUserCommand(reporterId, reportedUserId, ReportReason.Harassment, null, "Second report"),
             CancellationToken.None);
 
         Assert.True(result.IsDuplicate);

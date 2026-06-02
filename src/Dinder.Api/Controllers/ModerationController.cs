@@ -33,6 +33,7 @@ public sealed class ModerationController : ControllerBase
                 userId.Value,
                 request.ReportedUserId,
                 request.Reason,
+                request.SubCategory,
                 request.Description));
 
             return Ok(new
@@ -85,4 +86,4 @@ public sealed class ModerationController : ControllerBase
 
 // ── Request DTOs ──────────────────────────────────────────────────────
 
-public sealed record ReportUserRequest(Guid ReportedUserId, ReportReason Reason, string? Description);
+public sealed record ReportUserRequest(Guid ReportedUserId, ReportReason Reason, string? SubCategory, string? Description);

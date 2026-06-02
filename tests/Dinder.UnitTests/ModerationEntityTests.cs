@@ -12,7 +12,7 @@ public class ModerationEntityTests
         var reporterId = Guid.NewGuid();
         var reportedUserId = Guid.NewGuid();
 
-        var report = new Report(reporterId, reportedUserId, ReportReason.Harassment, "They were harassing me.");
+        var report = new Report(reporterId, reportedUserId, ReportReason.Harassment, null, "They were harassing me.");
 
         Assert.NotEqual(Guid.Empty, report.Id);
         Assert.Equal(reporterId, report.ReporterId);
@@ -26,7 +26,7 @@ public class ModerationEntityTests
     [Fact]
     public void Report_Resolve_SetsStatusAndResolutionNote()
     {
-        var report = new Report(Guid.NewGuid(), Guid.NewGuid(), ReportReason.Spam, null);
+        var report = new Report(Guid.NewGuid(), Guid.NewGuid(), ReportReason.Spam, null, null);
 
         report.Resolve("Spam confirmed, user banned.");
 
@@ -38,7 +38,7 @@ public class ModerationEntityTests
     [Fact]
     public void Report_Dismiss_SetsDismissedStatus()
     {
-        var report = new Report(Guid.NewGuid(), Guid.NewGuid(), ReportReason.Other, null);
+        var report = new Report(Guid.NewGuid(), Guid.NewGuid(), ReportReason.Other, null, null);
 
         report.Dismiss("No action needed.");
 
@@ -51,7 +51,7 @@ public class ModerationEntityTests
     public void Report_FakeProfileReason_PersistsCorrectly()
     {
         var reporterId = Guid.NewGuid();
-        var report = new Report(reporterId, Guid.NewGuid(), ReportReason.FakeProfile, "This is a catfish account.");
+        var report = new Report(reporterId, Guid.NewGuid(), ReportReason.FakeProfile, null, "This is a catfish account.");
 
         Assert.Equal(ReportReason.FakeProfile, report.Reason);
         Assert.Equal("This is a catfish account.", report.Description);
