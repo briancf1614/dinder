@@ -52,21 +52,21 @@ Chain strategy: feature-branch-chain
 
 ## Phase 3: Discovery Premium Features (DI-4, EE-1)
 
-- [ ] 3.1 Modify `SwipeCommand` — tier-aware limit: Free=25, Plus=100, Premium=unlimited; 429 response includes `upgrade_url` — DI-4
-- [ ] 3.2 Create `UndoSwipeCommand` with `[RequiresTier(Plus)]` — removes last swipe, decrements daily counter — EE-1
-- [ ] 3.3 Create `GetLikesQuery` with `[RequiresTier(Plus)]` — returns users who right-swiped current user, excluding already-swiped — EE-1
-- [ ] 3.4 Create `BoostCommand` with `[RequiresTier(Premium)]` — 1/month limit enforced; bumps profile in candidate results — EE-1
-- [ ] 3.5 Add `POST /discovery/undo`, `GET /discovery/likes`, `POST /discovery/boost` to `DiscoveryController` — EE-1
+- [x] 3.1 Modify `SwipeCommand` — tier-aware limit: Free=25, Plus=100, Premium=unlimited; 429 response includes `upgrade_url` — DI-4
+- [x] 3.2 Create `UndoSwipeCommand` with `[RequiresTier(Plus)]` — removes last swipe, decrements daily counter — EE-1
+- [x] 3.3 Create `GetLikesQuery` with `[RequiresTier(Plus)]` — returns users who right-swiped current user, excluding already-swiped — EE-1
+- [x] 3.4 Create `BoostCommand` with `[RequiresTier(Premium)]` — 1/month limit enforced; bumps profile in candidate results — EE-1
+- [x] 3.5 Add `POST /discovery/undo`, `GET /discovery/likes`, `POST /discovery/boost` to `DiscoveryController` — EE-1
 
 ## Phase 4: Mobile Reach, DevOps & Testing
 
-- [ ] 4.1 Add Stripe CLI service to `docker-compose.yml` (`stripe listen --forward-to api:8080/api/v1/webhooks/stripe`) — SM-3
-- [ ] 4.2 Create Angular PWA `manifest.json` + `ngsw-config.json` in `src/app/` for mobile browser installability
-- [ ] 4.3 Run EF migration `AddSubscriptionTier` on identity schema (DinderDbContext) — SM-1, IA-7
-- [ ] 4.4 Run EF migration `InitialSubscription` on subscription schema (SubscriptionDbContext) — SM-1
-- [ ] 4.5 Unit test: `EntitlementBehavior` rejects Free user from `[RequiresTier(Plus)]` command, passes Plus user — EE-2
-- [ ] 4.6 Unit test: `SwipeCommand` tier-aware limits (Free 25th swipe passes, 26th returns 429+upgrade_url; Premium unlimited) — DI-4
-- [ ] 4.7 Unit test: Subscription status progression (active → past_due → 7d grace → expired → Free) — SM-4
-- [ ] 4.8 Integration test: SubscriptionDbContext writes + Stripe webhook idempotency (replayed event is no-op) — SM-3
-- [ ] 4.9 Integration test: JWT tier claim round-trip (login → tier in token; refresh → tier preserved) — IA-7
-- [ ] 4.10 Contract test: new REST endpoints via Swashbuckle OpenAPI; verify all 95 existing tests pass
+- [x] 4.1 Add Stripe CLI service to `docker-compose.yml` (`stripe listen --forward-to api:8080/api/v1/webhooks/stripe`) — SM-3
+- [x] 4.2 Create Angular PWA `manifest.json` + `ngsw-config.json` in `src/app/` for mobile browser installability
+- [x] 4.3 Run EF migration `AddSubscriptionTier` on identity schema (DinderDbContext) — SM-1, IA-7
+- [x] 4.4 Run EF migration `InitialSubscription` on subscription schema (SubscriptionDbContext) — SM-1
+- [x] 4.5 Unit test: `EntitlementBehavior` rejects Free user from `[RequiresTier(Plus)]` command, passes Plus user — EE-2
+- [x] 4.6 Unit test: `SwipeCommand` tier-aware limits (Free 25th swipe passes, 26th returns 429+upgrade_url; Premium unlimited) — DI-4
+- [x] 4.7 Unit test: Subscription status progression (active → past_due → 7d grace → expired → Free) — SM-4
+- [x] 4.8 Integration test: SubscriptionDbContext writes + Stripe webhook idempotency (replayed event is no-op) — SM-3
+- [x] 4.9 Integration test: JWT tier claim round-trip (login → tier in token; refresh → tier preserved) — IA-7
+- [x] 4.10 Contract test: new REST endpoints via Swashbuckle OpenAPI; verify all 141 existing tests pass
