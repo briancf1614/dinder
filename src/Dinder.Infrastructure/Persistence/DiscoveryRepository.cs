@@ -29,6 +29,8 @@ public sealed class DiscoveryRepository : IDiscoveryRepository
 
     public void UpdateSwipe(Swipe swipe) => _discoveryContext.Swipes.Update(swipe);
 
+    public void RemoveSwipe(Swipe swipe) => _discoveryContext.Swipes.Remove(swipe);
+
     public async Task<int> GetDailySwipeCountAsync(Guid swiperId, CancellationToken cancellationToken = default)
     {
         var todayUtc = DateTime.UtcNow.Date;
@@ -40,6 +42,34 @@ public sealed class DiscoveryRepository : IDiscoveryRepository
     {
         return await _discoveryContext.Swipes
             .AnyAsync(s => s.SwiperId == swiperId && s.SwipedId == swipedId, cancellationToken);
+    }
+
+    // ── Undo ──────────────────────────────────────────────────────────
+
+    public async Task<Swipe?> GetLastSwipeAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _discoveryContext.Swipes
+            .Where(s => s.SwiperId == userId)
+            .OrderByDescending(s => s.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    // ── Likes ─────────────────────────────────────────────────────────
+
+    public async Task<List<Swipe>> GetLikesForUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        // Users who right-swiped the current user, excluding those the user has already swiped
+        var alreadySwipedIds = await _discoveryContext.Swipes
+            .Where(s => s.SwiperId == userId)
+            .Select(s => s.SwipedId)
+            .ToListAsync(cancellationToken);
+
+        return await _discoveryContext.Swipes
+            .Where(s => s.SwipedId == userId
+                        && s.Direction == SwipeDirection.Right
+                        && !alreadySwipedIds.Contains(s.SwiperId))
+            .OrderByDescending(s => s.CreatedAt)
+            .ToListAsync(cancellationToken);
     }
 
     // ── Matches ─────────────────────────────────────────────────────────
