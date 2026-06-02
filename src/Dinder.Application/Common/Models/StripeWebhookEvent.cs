@@ -12,4 +12,6 @@ public sealed record StripeWebhookEvent
     public SubscriptionTier? Tier { get; init; }
     public DateTime? CurrentPeriodEnd { get; init; }
     public DateTime Created { get; init; }
+    /// <summary>Raw Stripe subscription status string (e.g. "active", "past_due", "unpaid").</summary>
+    public string? StripeStatus { get; init; }
 }

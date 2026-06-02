@@ -101,6 +101,7 @@ public sealed class StripeService : IStripeService
                     CustomerId = sub.CustomerId,
                     CurrentPeriodEnd = sub.CurrentPeriodEnd,
                     Tier = ResolveTierFromSubscription(sub),
+                    StripeStatus = sub.Status,
                 };
                 break;
         }

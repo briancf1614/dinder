@@ -110,10 +110,23 @@ public sealed class ProcessStripeWebhookCommandHandler
             subscription.UpdatePeriodEnd(webhookEvent.CurrentPeriodEnd.Value);
         }
 
-        // Handle status progression via Stripe subscription status
-        // Stripe sends subscription status changes as customer.subscription.updated
-        // The tier from the Stripe event reflects the current subscription tier
-        if (webhookEvent.Tier.HasValue && webhookEvent.Tier.Value != subscription.Tier)
+        // Handle status transitions from Stripe
+        if (webhookEvent.StripeStatus == "past_due" && subscription.Status != SubscriptionStatus.PastDue)
+        {
+            subscription.MarkPastDue();
+        }
+        else if (webhookEvent.StripeStatus == "active" && subscription.Status == SubscriptionStatus.PastDue)
+        {
+            // Payment recovered — reactivate
+            subscription.Activate(
+                webhookEvent.Tier ?? subscription.Tier,
+                webhookEvent.CurrentPeriodEnd ?? subscription.CurrentPeriodEnd);
+        }
+
+        // Sync tier if changed
+        if (webhookEvent.Tier.HasValue
+            && webhookEvent.Tier.Value != subscription.Tier
+            && subscription.Status != SubscriptionStatus.PastDue)
         {
             subscription.Activate(webhookEvent.Tier.Value,
                 webhookEvent.CurrentPeriodEnd ?? subscription.CurrentPeriodEnd);
