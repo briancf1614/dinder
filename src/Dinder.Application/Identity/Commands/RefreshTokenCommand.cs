@@ -46,7 +46,7 @@ public sealed class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCom
         }
 
         // Valid rotation: generate new pair, revoke old
-        var (newAccessToken, newRefreshToken) = _jwtService.GenerateTokenPair(user.Id, user.Email);
+        var (newAccessToken, newRefreshToken) = _jwtService.GenerateTokenPair(user.Id, user.Email, tier: user.Tier.ToString());
         existingToken.Revoke(newRefreshToken);
         user.AddRefreshToken(newRefreshToken, DateTime.UtcNow.AddDays(30));
 
