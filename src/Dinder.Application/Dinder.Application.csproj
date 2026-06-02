@@ -19,4 +19,10 @@
     <ProjectReference Include="..\Dinder.Contracts\Dinder.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Gamification\achievements.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

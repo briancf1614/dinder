@@ -43,6 +43,23 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(x => x.SoftDeletedAt);
 
+        builder.Property(x => x.DailyStreak)
+            .IsRequired()
+            .HasDefaultValue(0);
+
+        builder.Property(x => x.LastStreakDate);
+
+        builder.Property(x => x.DailyBonusSwipes)
+            .IsRequired()
+            .HasDefaultValue(0);
+
+        builder.Property(x => x.ProfileCompletenessScore)
+            .IsRequired()
+            .HasDefaultValue(0);
+
+        builder.Property(x => x.Achievements)
+            .HasMaxLength(4000);
+
         builder.Property(x => x.Tier)
             .HasConversion<string>()
             .HasMaxLength(16)

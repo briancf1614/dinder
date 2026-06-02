@@ -1,4 +1,5 @@
 using Dinder.Domain.Entities;
+using Dinder.Domain.Enums;
 using Dinder.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -101,6 +102,46 @@ public sealed class ChatRepository : IChatRepository
     {
         return await _communicationContext.Messages
             .CountAsync(m => m.ConversationId == conversationId && m.SenderId != userId && m.ReadAt == null, cancellationToken);
+    }
+
+    // ── Message count for achievements ──────────────────────────────────
+
+    public async Task<int> GetMessageCountBySenderAsync(Guid senderId, CancellationToken cancellationToken = default)
+    {
+        return await _communicationContext.Messages
+            .CountAsync(m => m.SenderId == senderId, cancellationToken);
+    }
+
+    // ── Conversation list ───────────────────────────────────────────────
+
+    public async Task<List<Conversation>> GetConversationsByUserIdAsync(
+        Guid userId, Guid? cursor, int limit, CancellationToken cancellationToken = default)
+    {
+        var query = _discoveryContext.Conversations
+            .Include(c => c.Match)
+            .Where(c => c.Status == ConversationStatus.Active)
+            .Where(c => c.Match.UserId1 == userId || c.Match.UserId2 == userId)
+            .AsQueryable();
+
+        if (cursor.HasValue)
+        {
+            var cursorConversation = await _discoveryContext.Conversations
+                .FirstOrDefaultAsync(c => c.Id == cursor.Value, cancellationToken);
+            if (cursorConversation is not null)
+            {
+                query = query.Where(c => c.CreatedAt < cursorConversation.CreatedAt
+                    || (c.CreatedAt == cursorConversation.CreatedAt && c.Id.CompareTo(cursorConversation.Id) < 0));
+            }
+        }
+
+        // Fetch limit+1 to determine if there's a next page
+        var conversations = await query
+            .OrderByDescending(c => c.CreatedAt)
+            .ThenByDescending(c => c.Id)
+            .Take(limit + 1)
+            .ToListAsync(cancellationToken);
+
+        return conversations;
     }
 
     // ── Save ────────────────────────────────────────────────────────────

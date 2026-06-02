@@ -1,4 +1,5 @@
 using Dinder.Domain.Entities;
+using Dinder.Domain.Events;
 using Dinder.Domain.Interfaces;
 using MediatR;
 
@@ -20,13 +21,16 @@ public sealed class UpdateProfilePromptsCommandHandler : IRequestHandler<UpdateP
 {
     private readonly IProfileRepository _profileRepository;
     private readonly IAdminRepository _adminRepository;
+    private readonly IMediator _mediator;
 
     public UpdateProfilePromptsCommandHandler(
         IProfileRepository profileRepository,
-        IAdminRepository adminRepository)
+        IAdminRepository adminRepository,
+        IMediator mediator)
     {
         _profileRepository = profileRepository;
         _adminRepository = adminRepository;
+        _mediator = mediator;
     }
 
     public async Task Handle(UpdateProfilePromptsCommand request, CancellationToken cancellationToken)
@@ -63,6 +67,8 @@ public sealed class UpdateProfilePromptsCommandHandler : IRequestHandler<UpdateP
         profile.SetPrompts(promptEntities);
 
         await _profileRepository.SaveChangesAsync(cancellationToken);
+
+        await _mediator.Publish(new ProfileUpdatedEvent(request.UserId, DateTime.UtcNow), cancellationToken);
     }
 }
 

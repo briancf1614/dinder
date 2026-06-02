@@ -144,6 +144,40 @@ public class EntitlementBehaviorTests
     }
 
     [Fact]
+    public async Task FreeUser_HitsPlusGate_ExceptionContainsTierMetadata()
+    {
+        // Arrange
+        var behavior = new EntitlementBehavior<TestCommand, Unit>(_httpContextAccessorMock.Object);
+        SetupHttpContext(tier: "Free", isAuthenticated: true);
+        var command = new TestCommand();
+
+        // Act
+        var ex = await Assert.ThrowsAsync<ForbiddenException>(
+            () => behavior.Handle(command, NextThrowing, CancellationToken.None));
+
+        // Assert — EE-2: 403 body must include RequiredTier + CurrentTier
+        Assert.Equal(SubscriptionTier.Plus, ex.RequiredTier);
+        Assert.Equal(SubscriptionTier.Free, ex.CurrentTier);
+    }
+
+    [Fact]
+    public async Task FreeUser_HitsPremiumGate_ExceptionContainsTierMetadata()
+    {
+        // Arrange
+        var behavior = new EntitlementBehavior<PremiumGatedCommand, Unit>(_httpContextAccessorMock.Object);
+        SetupHttpContext(tier: "Free", isAuthenticated: true);
+        var command = new PremiumGatedCommand();
+
+        // Act
+        var ex = await Assert.ThrowsAsync<ForbiddenException>(
+            () => behavior.Handle(command, NextThrowing, CancellationToken.None));
+
+        // Assert — EE-2: Premium required, Free current
+        Assert.Equal(SubscriptionTier.Premium, ex.RequiredTier);
+        Assert.Equal(SubscriptionTier.Free, ex.CurrentTier);
+    }
+
+    [Fact]
     public async Task NoHttpContext_AllowsThrough()
     {
         // Arrange (no HttpContext set up)

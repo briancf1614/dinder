@@ -1,5 +1,6 @@
 using Dinder.Domain.Entities;
 using Dinder.Domain.Enums;
+using Dinder.Domain.Events;
 using Dinder.Domain.Interfaces;
 using MediatR;
 
@@ -30,10 +31,12 @@ public sealed record ProfileResult(
 public sealed class CreateOrUpdateProfileCommandHandler : IRequestHandler<CreateOrUpdateProfileCommand, ProfileResult>
 {
     private readonly IProfileRepository _profileRepository;
+    private readonly IMediator _mediator;
 
-    public CreateOrUpdateProfileCommandHandler(IProfileRepository profileRepository)
+    public CreateOrUpdateProfileCommandHandler(IProfileRepository profileRepository, IMediator mediator)
     {
         _profileRepository = profileRepository;
+        _mediator = mediator;
     }
 
     public async Task<ProfileResult> Handle(CreateOrUpdateProfileCommand request, CancellationToken cancellationToken)
@@ -68,6 +71,8 @@ public sealed class CreateOrUpdateProfileCommandHandler : IRequestHandler<Create
         }
 
         await _profileRepository.SaveChangesAsync(cancellationToken);
+
+        await _mediator.Publish(new ProfileUpdatedEvent(request.UserId, DateTime.UtcNow), cancellationToken);
 
         return MapResult(profile);
     }

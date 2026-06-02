@@ -1,0 +1,37 @@
+[
+  {
+    "type": "FirstMatch",
+    "name": "First Match",
+    "description": "You matched with someone for the first time!",
+    "iconKey": "favorite",
+    "criteria": "First MatchCreatedEvent received"
+  },
+  {
+    "type": "CenturySwiper",
+    "name": "Century Swiper",
+    "description": "You've swiped 100 times — you know what you want!",
+    "iconKey": "swipe",
+    "criteria": "100 lifetime SwipeRecordedEvents"
+  },
+  {
+    "type": "ProfileComplete",
+    "name": "Profile Complete",
+    "description": "Your profile is 100% complete — photo, bio, preferences, and a prompt!",
+    "iconKey": "check_circle",
+    "criteria": "Photo + Bio + Preferences + at least one prompt"
+  },
+  {
+    "type": "SocialButterfly",
+    "name": "Social Butterfly",
+    "description": "You've sent 50 messages across your conversations!",
+    "iconKey": "chat",
+    "criteria": "50 lifetime MessageSentEvents"
+  },
+  {
+    "type": "StreakMaster",
+    "name": "Streak Master",
+    "description": "You've maintained a 30-day login streak!",
+    "iconKey": "local_fire_department",
+    "criteria": "DailyStreak reaches 30"
+  }
+]

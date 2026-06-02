@@ -19,6 +19,20 @@ public sealed class ChatController : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>Get cursor-paginated list of the authenticated user's active conversations.</summary>
+    [HttpGet("conversations")]
+    public async Task<IActionResult> GetConversations(
+        [FromQuery] Guid? cursor = null,
+        [FromQuery] int limit = 20)
+    {
+        var userId = GetUserId();
+        if (userId is null)
+            return Unauthorized();
+
+        var result = await _mediator.Send(new GetConversationsQuery(userId.Value, cursor, limit));
+        return Ok(result);
+    }
+
     /// <summary>Get cursor-paginated message history for a conversation.</summary>
     [HttpGet("conversations/{conversationId:guid}/messages")]
     public async Task<IActionResult> GetMessages(

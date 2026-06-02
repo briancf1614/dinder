@@ -33,11 +33,19 @@ public sealed class GetCandidatesQueryHandler : IRequestHandler<GetCandidatesQue
 {
     private readonly IDiscoveryRepository _discoveryRepository;
     private readonly IProfileRepository _profileRepository;
+    private readonly IProfileScorer? _profileScorer;
+    private readonly MatchingFeatureFlags _featureFlags;
 
-    public GetCandidatesQueryHandler(IDiscoveryRepository discoveryRepository, IProfileRepository profileRepository)
+    public GetCandidatesQueryHandler(
+        IDiscoveryRepository discoveryRepository,
+        IProfileRepository profileRepository,
+        MatchingFeatureFlags featureFlags,
+        IProfileScorer? profileScorer = null)
     {
         _discoveryRepository = discoveryRepository;
         _profileRepository = profileRepository;
+        _featureFlags = featureFlags;
+        _profileScorer = profileScorer;
     }
 
     public async Task<CandidatesResult> Handle(GetCandidatesQuery request, CancellationToken cancellationToken)
@@ -73,6 +81,17 @@ public sealed class GetCandidatesQueryHandler : IRequestHandler<GetCandidatesQue
         if (hasMore)
             candidates = candidates.Take(request.Limit).ToList();
 
+        // ML scoring — re-rank candidates by similarity when feature flag enabled
+        if (_featureFlags.UseMLScoring && _profileScorer is not null && candidates.Count > 0)
+        {
+            var scored = await _profileScorer.ScoreAsync(profile, candidates, cancellationToken);
+            // Reorder candidates by score descending while preserving the list
+            var scoredMap = scored.ToDictionary(s => s.ProfileId, s => s.Score);
+            candidates = candidates
+                .OrderByDescending(c => scoredMap.GetValueOrDefault(c.Id, 0))
+                .ToList();
+        }
+
         var result = candidates.Select(p => new CandidateDto(
             p.Id,
             p.UserId,
@@ -87,4 +106,10 @@ public sealed class GetCandidatesQueryHandler : IRequestHandler<GetCandidatesQue
 
         return new CandidatesResult(result, hasMore ? candidates.Last().Id : null);
     }
+}
+
+/// <summary>Feature flags for ML scoring integration.</summary>
+public sealed class MatchingFeatureFlags
+{
+    public bool UseMLScoring { get; init; }
 }

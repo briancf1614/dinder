@@ -15,6 +15,11 @@ public sealed class User
     public DateTime CreatedAt { get; private set; }
     public DateTime? SoftDeletedAt { get; private set; }
     public string? BanReason { get; private set; }
+    public int DailyStreak { get; private set; }
+    public DateTime? LastStreakDate { get; private set; }
+    public int DailyBonusSwipes { get; private set; }
+    public int ProfileCompletenessScore { get; private set; }
+    public string? Achievements { get; private set; }
 
     private readonly List<UserExternalLogin> _externalLogins = [];
     public IReadOnlyCollection<UserExternalLogin> ExternalLogins => _externalLogins.AsReadOnly();
@@ -113,4 +118,33 @@ public sealed class User
     }
 
     public bool IsAgeGated() => GetAge() < 18;
+
+    public void UpdateStreak(DateTime streakDate, bool increment)
+    {
+        if (increment)
+            DailyStreak++;
+        else
+            DailyStreak = 1; // Reset on missed day
+
+        // Cap at 30
+        if (DailyStreak > 30)
+            DailyStreak = 30;
+
+        LastStreakDate = streakDate;
+    }
+
+    public void SetBonusSwipes(int bonus)
+    {
+        DailyBonusSwipes = bonus;
+    }
+
+    public void SetCompletenessScore(int score)
+    {
+        ProfileCompletenessScore = score;
+    }
+
+    public void SetAchievements(string achievementsJson)
+    {
+        Achievements = achievementsJson;
+    }
 }

@@ -38,6 +38,12 @@ public sealed class DiscoveryRepository : IDiscoveryRepository
             .CountAsync(s => s.SwiperId == swiperId && s.CreatedAt >= todayUtc, cancellationToken);
     }
 
+    public async Task<int> GetLifetimeSwipeCountAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _discoveryContext.Swipes
+            .CountAsync(s => s.SwiperId == userId, cancellationToken);
+    }
+
     public async Task<bool> HasSwipedAsync(Guid swiperId, Guid swipedId, CancellationToken cancellationToken = default)
     {
         return await _discoveryContext.Swipes
