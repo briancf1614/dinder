@@ -60,6 +60,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+// Exception handling — must be early in the pipeline
+app.UseMiddleware<Dinder.Api.Middleware.ForbiddenExceptionMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<Dinder.Infrastructure.Auth.TokenRevocationMiddleware>();

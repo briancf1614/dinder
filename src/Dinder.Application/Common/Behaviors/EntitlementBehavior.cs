@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Dinder.Application.Common.Attributes;
+using Dinder.Application.Common.Exceptions;
 using Dinder.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -33,20 +34,18 @@ public sealed class EntitlementBehavior<TRequest, TResponse> : IPipelineBehavior
 
         var user = httpContext.User;
         if (user.Identity?.IsAuthenticated != true)
-            throw new UnauthorizedAccessException("Authentication required.");
+            throw new ForbiddenException("Authentication required.");
 
         var tierClaim = user.FindFirstValue("tier");
         if (string.IsNullOrWhiteSpace(tierClaim)
             || !Enum.TryParse<SubscriptionTier>(tierClaim, out var userTier))
         {
-            throw new UnauthorizedAccessException("Invalid or missing tier claim.");
+            throw new ForbiddenException("Invalid or missing tier claim.");
         }
 
         if (userTier < attribute.MinimumTier)
         {
-            throw new UnauthorizedAccessException(
-                $"This feature requires at least the {attribute.MinimumTier} tier. " +
-                $"Your current tier is {userTier}.");
+            throw new ForbiddenException(attribute.MinimumTier, userTier);
         }
 
         return await next();

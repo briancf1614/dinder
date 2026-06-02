@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Dinder.Application.Common.Attributes;
 using Dinder.Application.Common.Behaviors;
+using Dinder.Application.Common.Exceptions;
 using Dinder.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -91,7 +92,7 @@ public class EntitlementBehaviorTests
     }
 
     [Fact]
-    public async Task FreeUser_AccessesPlusGatedEndpoint_ThrowsUnauthorized()
+    public async Task FreeUser_AccessesPlusGatedEndpoint_ThrowsForbidden()
     {
         // Arrange
         var behavior = new EntitlementBehavior<TestCommand, Unit>(_httpContextAccessorMock.Object);
@@ -99,12 +100,12 @@ public class EntitlementBehaviorTests
         var command = new TestCommand();
 
         // Act & Assert
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(
+        await Assert.ThrowsAsync<ForbiddenException>(
             () => behavior.Handle(command, NextThrowing, CancellationToken.None));
     }
 
     [Fact]
-    public async Task FreeUser_AccessesPremiumGatedEndpoint_ThrowsUnauthorized()
+    public async Task FreeUser_AccessesPremiumGatedEndpoint_ThrowsForbidden()
     {
         // Arrange
         var behavior = new EntitlementBehavior<PremiumGatedCommand, Unit>(_httpContextAccessorMock.Object);
@@ -112,12 +113,12 @@ public class EntitlementBehaviorTests
         var command = new PremiumGatedCommand();
 
         // Act & Assert
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(
+        await Assert.ThrowsAsync<ForbiddenException>(
             () => behavior.Handle(command, NextThrowing, CancellationToken.None));
     }
 
     [Fact]
-    public async Task UnauthenticatedUser_ThrowsUnauthorized()
+    public async Task UnauthenticatedUser_ThrowsForbidden()
     {
         // Arrange
         var behavior = new EntitlementBehavior<TestCommand, Unit>(_httpContextAccessorMock.Object);
@@ -125,12 +126,12 @@ public class EntitlementBehaviorTests
         var command = new TestCommand();
 
         // Act & Assert
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(
+        await Assert.ThrowsAsync<ForbiddenException>(
             () => behavior.Handle(command, NextThrowing, CancellationToken.None));
     }
 
     [Fact]
-    public async Task MissingTierClaim_ThrowsUnauthorized()
+    public async Task MissingTierClaim_ThrowsForbidden()
     {
         // Arrange
         var behavior = new EntitlementBehavior<TestCommand, Unit>(_httpContextAccessorMock.Object);
@@ -138,7 +139,7 @@ public class EntitlementBehaviorTests
         var command = new TestCommand();
 
         // Act & Assert
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(
+        await Assert.ThrowsAsync<ForbiddenException>(
             () => behavior.Handle(command, NextThrowing, CancellationToken.None));
     }
 
