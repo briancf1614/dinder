@@ -41,14 +41,14 @@ Chain strategy: feature-branch-chain
 
 ## Phase 2: Subscription Service & API (SM-2, SM-3, SM-4, EE-2)
 
-- [ ] 2.1 Create `CreateCheckoutSessionCommand` + handler — reject 409 if already subscribed to same tier; call StripeService; return sessionUrl — SM-2
-- [ ] 2.2 Create `CreatePortalSessionCommand` + handler — return Stripe Customer Portal URL — SM-2
-- [ ] 2.3 Create `GetSubscriptionStatusQuery` + handler — return tier, status, CurrentPeriodEnd — SM-4
-- [ ] 2.4 Create `ProcessStripeWebhookCommand` — handle `checkout.session.completed` (activate), `customer.subscription.updated` (past_due → 7d grace), `customer.subscription.deleted` (revert Free); idempotent via StripeSubscriptionId upsert — SM-3, SM-4
-- [ ] 2.5 Create `EntitlementBehavior` (MediatR `IPipelineBehavior`) — read `tier` from JWT claims, check `[RequiresTier]` attribute, reject 403 if insufficient; no DB round-trip at gate — EE-2
-- [ ] 2.6 Create `SubscriptionController` — `POST checkout`, `GET status`, `POST portal` — SM-2, SM-4
-- [ ] 2.7 Create `WebhookController` — `POST stripe` (unauth, raw body, `Stripe-Signature` verify via EventUtility) — SM-3
-- [ ] 2.8 Register `EntitlementBehavior` in MediatR pipeline (Program.cs); enable raw body buffering for webhook route; add `EnableSubscriptions` feature flag — EE-2, SM-3
+- [x] 2.1 Create `CreateCheckoutSessionCommand` + handler — reject 409 if already subscribed to same tier; call StripeService; return sessionUrl — SM-2
+- [x] 2.2 Create `CreatePortalSessionCommand` + handler — return Stripe Customer Portal URL — SM-2
+- [x] 2.3 Create `GetSubscriptionStatusQuery` + handler — return tier, status, CurrentPeriodEnd — SM-4
+- [x] 2.4 Create `ProcessStripeWebhookCommand` — handle `checkout.session.completed` (activate), `customer.subscription.updated` (past_due → 7d grace), `customer.subscription.deleted` (revert Free); idempotent via StripeSubscriptionId upsert — SM-3, SM-4
+- [x] 2.5 Create `EntitlementBehavior` (MediatR `IPipelineBehavior`) — read `tier` from JWT claims, check `[RequiresTier]` attribute, reject 403 if insufficient; no DB round-trip at gate — EE-2
+- [x] 2.6 Create `SubscriptionController` — `POST checkout`, `GET status`, `POST portal` — SM-2, SM-4
+- [x] 2.7 Create `WebhookController` — `POST stripe` (unauth, raw body, `Stripe-Signature` verify via EventUtility) — SM-3
+- [x] 2.8 Register `EntitlementBehavior` in MediatR pipeline (Program.cs); enable raw body buffering for webhook route; add `EnableSubscriptions` feature flag — EE-2, SM-3
 
 ## Phase 3: Discovery Premium Features (DI-4, EE-1)
 
