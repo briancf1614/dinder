@@ -43,6 +43,15 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(x => x.SoftDeletedAt);
 
+        builder.Property(x => x.Tier)
+            .HasConversion<string>()
+            .HasMaxLength(16)
+            .IsRequired()
+            .HasDefaultValue(SubscriptionTier.Free);
+
+        builder.Property(x => x.StripeCustomerId)
+            .HasMaxLength(128);
+
         builder.HasMany(x => x.ExternalLogins)
             .WithOne()
             .HasForeignKey(x => x.UserId)

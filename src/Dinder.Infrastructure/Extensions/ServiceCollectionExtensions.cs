@@ -2,6 +2,7 @@ using System.Text;
 using Dinder.Application.Common.Interfaces;
 using Dinder.Domain.Interfaces;
 using Dinder.Infrastructure.Auth;
+using Dinder.Infrastructure.Payments;
 using Dinder.Infrastructure.Persistence;
 using Dinder.Infrastructure.Storage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -108,6 +109,19 @@ public static class ServiceCollectionExtensions
             });
         });
 
+        services.AddDbContext<SubscriptionDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.MigrationsHistoryTable(
+                    "__EFMigrationsHistory",
+                    SubscriptionDbContext.SubscriptionSchema);
+            });
+        });
+
+        // Stripe
+        services.Configure<StripeConfiguration>(configuration.GetSection(StripeConfiguration.SectionName));
+
         // Auth
         var jwtSecret = configuration["Jwt:Secret"]
             ?? throw new InvalidOperationException("JWT secret not configured.");
@@ -162,8 +176,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IModerationRepository, ModerationRepository>();
         services.AddScoped<IAdminRepository, AdminRepository>();
         services.AddScoped<IMediaRepository, MediaRepository>();
+        services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
         services.AddSingleton<IJwtService, JwtService>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        services.AddSingleton<IStripeService, StripeService>();
 
         // Blob storage
         services.AddSingleton<IBlobStorageService, AzureBlobStorageService>();
