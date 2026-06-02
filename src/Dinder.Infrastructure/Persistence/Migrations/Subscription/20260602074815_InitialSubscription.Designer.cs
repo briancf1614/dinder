@@ -3,22 +3,25 @@ using System;
 using Dinder.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Dinder.Infrastructure.Persistence.Migrations.Identity
+namespace Dinder.Infrastructure.Persistence.Migrations.Subscription
 {
-    [DbContext(typeof(DinderDbContext))]
-    partial class DinderDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(SubscriptionDbContext))]
+    [Migration("20260602074815_InitialSubscription")]
+    partial class InitialSubscription
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("identity")
+                .HasDefaultSchema("subscription")
                 .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -60,7 +63,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
 
                     b.HasIndex("Action", "Timestamp");
 
-                    b.ToTable("audit_log", "identity");
+                    b.ToTable("audit_log", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.Block", b =>
@@ -85,7 +88,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
                     b.HasIndex("BlockerId", "BlockedId")
                         .IsUnique();
 
-                    b.ToTable("blocks", "identity");
+                    b.ToTable("blocks", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.Conversation", b =>
@@ -118,7 +121,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
 
                     b.HasIndex("Status");
 
-                    b.ToTable("conversations", "identity");
+                    b.ToTable("conversations", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.DeviceToken", b =>
@@ -156,7 +159,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
 
                     b.HasIndex("UserId", "IsExpired");
 
-                    b.ToTable("device_tokens", "identity");
+                    b.ToTable("device_tokens", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.Match", b =>
@@ -183,7 +186,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
                     b.HasIndex("UserId1", "UserId2")
                         .IsUnique();
 
-                    b.ToTable("matches", "identity");
+                    b.ToTable("matches", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.MediaFile", b =>
@@ -231,7 +234,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
 
                     b.HasIndex("Status", "CreatedAt");
 
-                    b.ToTable("media_files", "identity");
+                    b.ToTable("media_files", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.Message", b =>
@@ -265,7 +268,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
 
                     b.HasIndex("ConversationId", "SentAt");
 
-                    b.ToTable("messages", "identity");
+                    b.ToTable("messages", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.Notification", b =>
@@ -307,7 +310,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
 
                     b.HasIndex("UserId", "IsRead");
 
-                    b.ToTable("notifications", "identity");
+                    b.ToTable("notifications", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.PhotoReview", b =>
@@ -346,7 +349,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
 
                     b.HasIndex("Status", "CreatedAt");
 
-                    b.ToTable("photo_reviews", "identity");
+                    b.ToTable("photo_reviews", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.Profile", b =>
@@ -405,7 +408,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("profiles", "identity");
+                    b.ToTable("profiles", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.ProfilePhoto", b =>
@@ -430,7 +433,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
 
                     b.HasIndex("ProfileId", "SortOrder");
 
-                    b.ToTable("profile_photos", "identity");
+                    b.ToTable("profile_photos", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.ProfilePreference", b =>
@@ -461,7 +464,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
                     b.HasIndex("ProfileId")
                         .IsUnique();
 
-                    b.ToTable("profile_preferences", "identity");
+                    b.ToTable("profile_preferences", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.RefreshToken", b =>
@@ -505,7 +508,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
 
                     b.HasIndex("UserId1");
 
-                    b.ToTable("refresh_tokens", "identity");
+                    b.ToTable("refresh_tokens", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.Report", b =>
@@ -550,7 +553,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
 
                     b.HasIndex("Status", "CreatedAt");
 
-                    b.ToTable("reports", "identity");
+                    b.ToTable("reports", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.Subscription", b =>
@@ -594,7 +597,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("subscriptions", "identity");
+                    b.ToTable("subscriptions", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.Swipe", b =>
@@ -626,7 +629,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
 
                     b.HasIndex("SwipedId", "SwiperId", "Direction");
 
-                    b.ToTable("swipes", "identity");
+                    b.ToTable("swipes", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.User", b =>
@@ -682,7 +685,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
 
                     b.HasIndex("Status");
 
-                    b.ToTable("users", "identity");
+                    b.ToTable("users", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.UserExternalLogin", b =>
@@ -716,7 +719,7 @@ namespace Dinder.Infrastructure.Persistence.Migrations.Identity
                     b.HasIndex("Provider", "ProviderUserId")
                         .IsUnique();
 
-                    b.ToTable("user_external_logins", "identity");
+                    b.ToTable("user_external_logins", "subscription");
                 });
 
             modelBuilder.Entity("Dinder.Domain.Entities.Conversation", b =>

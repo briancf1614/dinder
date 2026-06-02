@@ -3,6 +3,7 @@ using System;
 using Dinder.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Dinder.Infrastructure.Persistence.Migrations.Identity
 {
     [DbContext(typeof(DinderDbContext))]
-    partial class DinderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260602074749_AddSubscriptionTier")]
+    partial class AddSubscriptionTier
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

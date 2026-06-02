@@ -9,7 +9,8 @@ public sealed class SubscriptionDbContextFactory : IDesignTimeDbContextFactory<S
     {
         var optionsBuilder = new DbContextOptionsBuilder<SubscriptionDbContext>();
         optionsBuilder.UseNpgsql(
-            "Host=localhost;Database=dinder;Username=postgres;Password=postgres");
+            "Host=localhost;Database=dinder;Username=postgres;Password=postgres",
+            npgsqlOptions => npgsqlOptions.UseNetTopologySuite());
 
         return new SubscriptionDbContext(optionsBuilder.Options);
     }
