@@ -2,28 +2,29 @@
 
 ## Purpose
 
-Manage user profile data — photos, bio, preferences, and geolocation. Profiles are the primary unit of discovery. A profile MUST be complete (at least one approved photo + preferences) to enter the discovery pool.
+Manage user profile data — photos, bio, prompts, preferences, and geolocation. Profiles are the primary unit of discovery. A profile MUST be complete (at least one approved photo + preferences) to enter the discovery pool. Prompts are optional and do not gate discovery.
 
 ## Requirements
 
 | ID | Requirement | Strength |
 |----|-------------|----------|
 | UP-1 | Profile Creation & Editing | MUST |
-| UP-2 | Photo Management (up to 6, moderation gated) | MUST |
+| UP-2 | Photo Management (up to 6) | MUST |
 | UP-3 | Preference Configuration | MUST |
 | UP-4 | Geolocation Storage (PostGIS) | MUST |
 | UP-5 | Age Gate — 18+ Only | MUST |
+| UP-6 | Profile Prompts Integration | MUST |
 
 ### UP-1: Profile Creation & Editing
 
-The system MUST allow an authenticated user to create and edit a profile with display name, bio (max 500 chars), gender identity, and interested-in preferences. A profile SHALL be marked `IsDiscoverable = false` until all required fields plus at least one approved photo are present.
+The system MUST allow an authenticated user to create and edit a profile with display name, bio (max 500 chars), gender identity, interested-in preferences, and up to 3 prompt selections. A profile SHALL be marked `IsDiscoverable = false` until all required fields plus at least one approved photo are present.
 
 #### Scenario: Create profile with minimum fields
 
 - GIVEN an authenticated user with no existing profile
 - WHEN they submit display name, gender, interested-in, and birthday
 - THEN a profile is created with `IsDiscoverable = false`
-- AND the user is prompted to upload at least one photo
+- AND the user is prompted to upload at least one photo and optionally add prompts
 
 #### Scenario: Profile becomes discoverable
 
@@ -34,14 +35,15 @@ The system MUST allow an authenticated user to create and edit a profile with di
 
 ### UP-2: Photo Management (up to 6)
 
-The system MUST support uploading up to 6 photos via pre-signed URLs. Uploaded photos SHALL enter the moderation queue before becoming publicly visible. Users MAY reorder photos. At least one approved photo MUST exist to enable discovery.
+The system MUST support uploading up to 6 photos via pre-signed URLs. Uploaded photos SHALL trigger an async AI moderation scan. Clean photos auto-approve; flagged photos enter the manual queue. Users MAY reorder photos. At least one approved photo MUST exist to enable discovery.
 
 #### Scenario: Upload first photo
 
 - GIVEN a user with zero photos
 - WHEN they request a pre-signed upload URL, upload, and confirm
-- THEN the photo is created with status `PendingReview`
-- AND the photo enters the moderation queue
+- THEN the photo is created with status `AIScanning`
+- AND an async AI moderation scan is dispatched
+- AND if clean, the photo auto-approves; if flagged, it enters the manual queue
 
 #### Scenario: Exceed 6-photo limit
 
@@ -80,3 +82,19 @@ The system MUST validate that the user's birthday indicates age 18 or older at r
 - WHEN they submit the registration form
 - THEN registration is rejected with a clear age-requirement message
 - AND no user account or personal data is persisted
+
+### UP-6: Profile Prompts Integration
+
+The profile MUST support up to 3 Hinge-style prompts selectable from a catalog. Prompt answers SHALL appear on public profiles and discovery cards. Prompts are optional — absence of prompts SHALL NOT block discovery.
+
+#### Scenario: Profile includes prompts
+
+- GIVEN a user with 3 prompts configured
+- WHEN their profile is viewed or appears in discovery
+- THEN prompts and answers display alongside bio and photos
+
+#### Scenario: Empty prompts do not block discovery
+
+- GIVEN a user with approved photo, bio, and preferences but 0 prompts
+- WHEN `IsDiscoverable` is evaluated
+- THEN the profile remains discoverable

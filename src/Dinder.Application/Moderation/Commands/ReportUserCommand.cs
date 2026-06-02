@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Dinder.Application.Moderation.Commands;
 
-public sealed record ReportUserCommand(Guid ReporterId, Guid ReportedUserId, ReportReason Reason, string? Description) : IRequest<ReportResult>;
+public sealed record ReportUserCommand(Guid ReporterId, Guid ReportedUserId, ReportReason Reason, string? SubCategory, string? Description) : IRequest<ReportResult>;
 
 public sealed record ReportResult(Guid ReportId, bool IsDuplicate);
 
@@ -41,7 +41,7 @@ public sealed class ReportUserCommandHandler : IRequestHandler<ReportUserCommand
         var alreadyReported = await _moderationRepository.HasReportedAsync(request.ReporterId, request.ReportedUserId, cancellationToken);
 
         // Still create the report even if duplicate, per SM-1 spec
-        var report = new Report(request.ReporterId, request.ReportedUserId, request.Reason, request.Description);
+        var report = new Report(request.ReporterId, request.ReportedUserId, request.Reason, request.SubCategory, request.Description);
         _moderationRepository.AddReport(report);
         await _moderationRepository.SaveChangesAsync(cancellationToken);
 

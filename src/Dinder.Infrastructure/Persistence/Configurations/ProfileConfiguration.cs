@@ -65,5 +65,14 @@ public sealed class ProfileConfiguration : IEntityTypeConfiguration<Profile>
             .WithOne(x => x.Profile)
             .HasForeignKey(x => x.ProfileId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // Prompts stored as JSONB owned entity (max 3)
+        builder.OwnsMany(x => x.Prompts, prompts =>
+        {
+            prompts.ToJson("prompts");
+            prompts.Property(p => p.PromptId).IsRequired();
+            prompts.Property(p => p.Answer).HasMaxLength(150).IsRequired();
+            prompts.Property(p => p.Order).IsRequired();
+        });
     }
 }

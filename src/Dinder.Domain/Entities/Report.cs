@@ -8,6 +8,7 @@ public sealed class Report
     public Guid ReporterId { get; private set; }
     public Guid ReportedUserId { get; private set; }
     public ReportReason Reason { get; private set; }
+    public string? SubCategory { get; private set; }
     public string? Description { get; private set; }
     public ReportStatus Status { get; private set; }
     public string? ResolutionNote { get; private set; }
@@ -18,12 +19,13 @@ public sealed class Report
     private Report() { } // EF Core
 #pragma warning restore CS8618
 
-    public Report(Guid reporterId, Guid reportedUserId, ReportReason reason, string? description)
+    public Report(Guid reporterId, Guid reportedUserId, ReportReason reason, string? subCategory, string? description)
     {
         Id = Guid.NewGuid();
         ReporterId = reporterId;
         ReportedUserId = reportedUserId;
         Reason = reason;
+        SubCategory = subCategory;
         Description = description;
         Status = ReportStatus.Pending;
         CreatedAt = DateTime.UtcNow;

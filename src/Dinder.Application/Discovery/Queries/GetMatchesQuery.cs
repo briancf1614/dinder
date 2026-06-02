@@ -9,7 +9,9 @@ public sealed record MatchDto(
     Guid MatchId,
     Guid MatchedUserId,
     Guid? ConversationId,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string? IcebreakerQuestion,
+    string? IcebreakerCategory);
 
 public sealed class GetMatchesQueryHandler : IRequestHandler<GetMatchesQuery, List<MatchDto>>
 {
@@ -28,6 +30,8 @@ public sealed class GetMatchesQueryHandler : IRequestHandler<GetMatchesQuery, Li
             m.Id,
             m.UserId1 == request.UserId ? m.UserId2 : m.UserId1,
             m.Conversation?.Id,
-            m.CreatedAt)).ToList();
+            m.CreatedAt,
+            m.Conversation?.IcebreakerQuestion,
+            m.Conversation?.IcebreakerCategory?.ToString())).ToList();
     }
 }

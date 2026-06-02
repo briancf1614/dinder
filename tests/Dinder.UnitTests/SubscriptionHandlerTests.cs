@@ -5,6 +5,7 @@ using Dinder.Application.Subscription.Queries;
 using Dinder.Domain.Entities;
 using Dinder.Domain.Enums;
 using Dinder.Domain.Interfaces;
+using MediatR;
 using Moq;
 using Xunit;
 using SubscriptionEntity = Dinder.Domain.Entities.Subscription;
@@ -17,6 +18,7 @@ public class SubscriptionHandlerTests
     private readonly Mock<IUserRepository> _userRepoMock;
     private readonly Mock<IStripeService> _stripeServiceMock;
     private readonly Mock<IStripePriceResolver> _priceResolverMock;
+    private readonly Mock<IMediator> _mediatorMock;
 
     public SubscriptionHandlerTests()
     {
@@ -24,6 +26,7 @@ public class SubscriptionHandlerTests
         _userRepoMock = new Mock<IUserRepository>();
         _stripeServiceMock = new Mock<IStripeService>();
         _priceResolverMock = new Mock<IStripePriceResolver>();
+        _mediatorMock = new Mock<IMediator>();
     }
 
     #region CreateCheckoutSession
@@ -212,7 +215,7 @@ public class SubscriptionHandlerTests
             .ReturnsAsync(user);
 
         var handler = new ProcessStripeWebhookCommandHandler(
-            _stripeServiceMock.Object, _subRepoMock.Object, _userRepoMock.Object);
+            _stripeServiceMock.Object, _subRepoMock.Object, _userRepoMock.Object, _mediatorMock.Object);
         var command = new ProcessStripeWebhookCommand("{}", "sig");
 
         // Act
@@ -252,7 +255,7 @@ public class SubscriptionHandlerTests
             .ReturnsAsync(existing);
 
         var handler = new ProcessStripeWebhookCommandHandler(
-            _stripeServiceMock.Object, _subRepoMock.Object, _userRepoMock.Object);
+            _stripeServiceMock.Object, _subRepoMock.Object, _userRepoMock.Object, _mediatorMock.Object);
         var command = new ProcessStripeWebhookCommand("{}", "sig");
 
         // Act
@@ -289,7 +292,7 @@ public class SubscriptionHandlerTests
             .ReturnsAsync(user);
 
         var handler = new ProcessStripeWebhookCommandHandler(
-            _stripeServiceMock.Object, _subRepoMock.Object, _userRepoMock.Object);
+            _stripeServiceMock.Object, _subRepoMock.Object, _userRepoMock.Object, _mediatorMock.Object);
         var command = new ProcessStripeWebhookCommand("{}", "sig");
 
         // Act

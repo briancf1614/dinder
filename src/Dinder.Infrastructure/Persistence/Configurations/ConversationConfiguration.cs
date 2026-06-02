@@ -25,6 +25,13 @@ public sealed class ConversationConfiguration : IEntityTypeConfiguration<Convers
 
         builder.Property(x => x.UnmatchedAt);
 
+        builder.Property(x => x.IcebreakerQuestion)
+            .HasMaxLength(150);
+
+        builder.Property(x => x.IcebreakerCategory)
+            .HasConversion<string>()
+            .HasMaxLength(32);
+
         builder.Property(x => x.CreatedAt)
             .IsRequired();
 

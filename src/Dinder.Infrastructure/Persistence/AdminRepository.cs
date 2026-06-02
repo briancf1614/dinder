@@ -72,6 +72,62 @@ public sealed class AdminRepository : IAdminRepository
 
     public void AddAuditLog(AdminAuditLog entry) => _adminContext.AuditLogs.Add(entry);
 
+    // ── Prompt Catalog ──────────────────────────────────────────────────
+
+    public async Task<List<PromptCatalog>> GetPromptCatalogAsync(CancellationToken cancellationToken = default)
+    {
+        return await _adminContext.PromptCatalog
+            .OrderBy(p => p.Category)
+            .ThenBy(p => p.Text)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<PromptCatalog>> GetEnabledPromptCatalogAsync(CancellationToken cancellationToken = default)
+    {
+        return await _adminContext.PromptCatalog
+            .Where(p => p.IsEnabled)
+            .OrderBy(p => p.Category)
+            .ThenBy(p => p.Text)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<PromptCatalog?> GetPromptCatalogByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _adminContext.PromptCatalog.FindAsync([id], cancellationToken);
+    }
+
+    public void AddPrompt(PromptCatalog prompt) => _adminContext.PromptCatalog.Add(prompt);
+
+    public void UpdatePrompt(PromptCatalog prompt) => _adminContext.PromptCatalog.Update(prompt);
+
+    // ── Icebreaker Library ──────────────────────────────────────────────
+
+    public async Task<List<IcebreakerLibrary>> GetIcebreakerLibraryAsync(CancellationToken cancellationToken = default)
+    {
+        return await _adminContext.IcebreakerLibrary
+            .OrderBy(i => i.Category)
+            .ThenBy(i => i.Text)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<IcebreakerLibrary>> GetEnabledIcebreakerLibraryAsync(CancellationToken cancellationToken = default)
+    {
+        return await _adminContext.IcebreakerLibrary
+            .Where(i => i.IsEnabled)
+            .OrderBy(i => i.Category)
+            .ThenBy(i => i.Text)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IcebreakerLibrary?> GetIcebreakerLibraryByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _adminContext.IcebreakerLibrary.FindAsync([id], cancellationToken);
+    }
+
+    public void AddIcebreaker(IcebreakerLibrary icebreaker) => _adminContext.IcebreakerLibrary.Add(icebreaker);
+
+    public void UpdateIcebreaker(IcebreakerLibrary icebreaker) => _adminContext.IcebreakerLibrary.Update(icebreaker);
+
     // ── Save ────────────────────────────────────────────────────────────
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)

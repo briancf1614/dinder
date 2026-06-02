@@ -1,6 +1,7 @@
 using Dinder.Application.Common.Interfaces;
 using Dinder.Application.Common.Models;
 using Dinder.Domain.Enums;
+using Dinder.Domain.Events;
 using Dinder.Domain.Interfaces;
 using MediatR;
 using SubscriptionEntity = Dinder.Domain.Entities.Subscription;
@@ -17,15 +18,18 @@ public sealed class ProcessStripeWebhookCommandHandler
     private readonly IStripeService _stripeService;
     private readonly ISubscriptionRepository _subscriptionRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IMediator _mediator;
 
     public ProcessStripeWebhookCommandHandler(
         IStripeService stripeService,
         ISubscriptionRepository subscriptionRepository,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        IMediator mediator)
     {
         _stripeService = stripeService;
         _subscriptionRepository = subscriptionRepository;
         _userRepository = userRepository;
+        _mediator = mediator;
     }
 
     public async Task Handle(ProcessStripeWebhookCommand request, CancellationToken cancellationToken)
@@ -89,6 +93,11 @@ public sealed class ProcessStripeWebhookCommandHandler
         _userRepository.Update(user);
 
         await _subscriptionRepository.SaveChangesAsync(cancellationToken);
+
+        // Analytics: track subscription activation (fire-and-forget)
+        await _mediator.Publish(
+            new SubscriptionActivatedEvent(subscription.Id, webhookEvent.UserId.Value, webhookEvent.Tier.Value.ToString()),
+            cancellationToken);
     }
 
     private async Task HandleSubscriptionUpdated(

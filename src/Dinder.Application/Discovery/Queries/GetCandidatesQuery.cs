@@ -24,7 +24,10 @@ public sealed record CandidateDto(
     string Gender,
     double? Latitude,
     double? Longitude,
-    int PhotoCount);
+    int PhotoCount,
+    List<CandidatePromptDto>? Prompts);
+
+public sealed record CandidatePromptDto(Guid PromptId, string Answer);
 
 public sealed class GetCandidatesQueryHandler : IRequestHandler<GetCandidatesQuery, CandidatesResult>
 {
@@ -79,7 +82,8 @@ public sealed class GetCandidatesQueryHandler : IRequestHandler<GetCandidatesQue
             p.Gender.ToString(),
             p.Location?.Y,
             p.Location?.X,
-            p.Photos.Count)).ToList();
+            p.Photos.Count,
+            p.Prompts.Select(pp => new CandidatePromptDto(pp.PromptId, pp.Answer)).ToList())).ToList();
 
         return new CandidatesResult(result, hasMore ? candidates.Last().Id : null);
     }

@@ -74,6 +74,26 @@ public sealed class MediaController : ControllerBase
         }
     }
 
+    /// <summary>Appeal a rejected or AI-flagged photo decision. Re-enters the manual moderation queue.</summary>
+    [HttpPost("photos/{mediaFileId:guid}/appeal")]
+    public async Task<IActionResult> AppealPhoto(Guid mediaFileId, [FromBody] AppealPhotoRequest request)
+    {
+        var userId = GetUserId();
+        if (userId is null)
+            return Unauthorized();
+
+        try
+        {
+            var result = await _mediator.Send(new AppealPhotoCommand(
+                userId.Value, mediaFileId, request.Reason));
+            return Ok(new { mediaFileId = result.MediaFileId, status = result.Status });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
     private Guid? GetUserId()
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
@@ -87,3 +107,4 @@ public sealed class MediaController : ControllerBase
 
 public sealed record GenerateUploadUrlRequest(string ContentType, string Extension);
 public sealed record ConfirmUploadRequest(string BlobKey, string ContentType, long FileSizeBytes);
+public sealed record AppealPhotoRequest(string Reason);

@@ -20,6 +20,46 @@ public sealed class CreateOrUpdateProfileCommandValidator : AbstractValidator<Cr
 
         RuleFor(x => x.Bio)
             .MaximumLength(500).WithMessage("Bio must be at most 500 characters.");
+
+        When(x => x.Prompts is not null, () =>
+        {
+            RuleFor(x => x.Prompts!.Count)
+                .LessThanOrEqualTo(3)
+                .WithMessage("Maximum 3 prompts allowed.");
+
+            RuleForEach(x => x.Prompts).ChildRules(prompts =>
+            {
+                prompts.RuleFor(p => p.Answer)
+                    .NotEmpty().WithMessage("Prompt answer is required.")
+                    .MaximumLength(150).WithMessage("Prompt answer must be at most 150 characters.");
+            });
+        });
+    }
+}
+
+public sealed class UpdateProfilePromptsCommandValidator : AbstractValidator<UpdateProfilePromptsCommand>
+{
+    public UpdateProfilePromptsCommandValidator()
+    {
+        RuleFor(x => x.UserId)
+            .NotEmpty();
+
+        RuleFor(x => x.Prompts)
+            .NotNull().WithMessage("Prompts list is required.");
+
+        RuleFor(x => x.Prompts.Count)
+            .LessThanOrEqualTo(3)
+            .WithMessage("Maximum 3 prompts allowed.");
+
+        RuleForEach(x => x.Prompts).ChildRules(prompts =>
+        {
+            prompts.RuleFor(p => p.PromptId)
+                .NotEmpty().WithMessage("Prompt ID is required.");
+
+            prompts.RuleFor(p => p.Answer)
+                .NotEmpty().WithMessage("Prompt answer is required.")
+                .MaximumLength(150).WithMessage("Prompt answer must be at most 150 characters.");
+        });
     }
 }
 

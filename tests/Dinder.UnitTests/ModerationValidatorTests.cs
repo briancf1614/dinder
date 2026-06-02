@@ -11,7 +11,7 @@ public class ModerationValidatorTests
     public void ReportUserCommandValidator_Valid_DontThrow()
     {
         var validator = new ReportUserCommandValidator();
-        var command = new ReportUserCommand(Guid.NewGuid(), Guid.NewGuid(), ReportReason.Harassment, "Bad behavior.");
+        var command = new ReportUserCommand(Guid.NewGuid(), Guid.NewGuid(), ReportReason.Harassment, null, "Bad behavior.");
 
         var result = validator.Validate(command);
 
@@ -23,7 +23,7 @@ public class ModerationValidatorTests
     {
         var userId = Guid.NewGuid();
         var validator = new ReportUserCommandValidator();
-        var command = new ReportUserCommand(userId, userId, ReportReason.Spam, null);
+        var command = new ReportUserCommand(userId, userId, ReportReason.Spam, null, null);
 
         var result = validator.Validate(command);
 
@@ -35,7 +35,7 @@ public class ModerationValidatorTests
     public void ReportUserCommandValidator_NoReason_Invalid()
     {
         var validator = new ReportUserCommandValidator();
-        var command = new ReportUserCommand(Guid.NewGuid(), Guid.NewGuid(), (ReportReason)99, "What?");
+        var command = new ReportUserCommand(Guid.NewGuid(), Guid.NewGuid(), (ReportReason)99, null, "What?");
 
         var result = validator.Validate(command);
 
@@ -50,6 +50,7 @@ public class ModerationValidatorTests
             Guid.NewGuid(),
             Guid.NewGuid(),
             ReportReason.Other,
+            null,
             new string('a', 1000)); // Max allowed
 
         var result = validator.Validate(command);

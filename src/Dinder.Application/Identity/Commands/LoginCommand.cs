@@ -1,4 +1,5 @@
 using Dinder.Application.Common.Interfaces;
+using Dinder.Domain.Events;
 using Dinder.Domain.Interfaces;
 using MediatR;
 
@@ -13,12 +14,18 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtService _jwtService;
+    private readonly IMediator _mediator;
 
-    public LoginCommandHandler(IUserRepository userRepository, IPasswordHasher passwordHasher, IJwtService jwtService)
+    public LoginCommandHandler(
+        IUserRepository userRepository,
+        IPasswordHasher passwordHasher,
+        IJwtService jwtService,
+        IMediator mediator)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _jwtService = jwtService;
+        _mediator = mediator;
     }
 
     public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -37,6 +44,9 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
         user.AddRefreshToken(refreshToken, DateTime.UtcNow.AddDays(30));
 
         await _userRepository.SaveChangesAsync(cancellationToken);
+
+        // Analytics: track login (fire-and-forget)
+        await _mediator.Publish(new UserLoggedInEvent(user.Id, DateTime.UtcNow), cancellationToken);
 
         return new LoginResult(user.Id, accessToken, refreshToken);
     }

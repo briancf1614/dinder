@@ -12,6 +12,7 @@ public interface IChatRepository
 
     // Conversation access
     Task<Conversation?> GetConversationAsync(Guid conversationId, CancellationToken cancellationToken = default);
+    Task<Conversation?> GetConversationByMatchIdAsync(Guid matchId, CancellationToken cancellationToken = default);
     Task<bool> IsParticipantAsync(Guid conversationId, Guid userId, CancellationToken cancellationToken = default);
     void UpdateConversation(Conversation conversation);
 

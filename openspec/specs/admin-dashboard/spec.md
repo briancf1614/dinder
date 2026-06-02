@@ -2,16 +2,18 @@
 
 ## Purpose
 
-Provide authenticated staff tools for user lookup, report review, and moderation actions. All admin endpoints MUST require the `Admin` role.
+Provide authenticated staff tools for user lookup, report review, moderation actions, analytics, and AI-pre-screened photo queues. All admin endpoints MUST require the `Admin` role.
 
 ## Requirements
 
 | ID | Requirement | Strength |
 |----|-------------|----------|
 | AD-1 | User Search by Email or ID | MUST |
-| AD-2 | Report Review Queue (filter + resolve) | MUST |
+| AD-2 | Report Review Queue (filter by status + sub-category, resolve) | MUST |
 | AD-3 | Ban / Unban User Actions | MUST |
 | AD-4 | Append-Only Admin Audit Log | MUST |
+| AD-5 | Analytics Widgets (DAU, conversion, matches) | MUST |
+| AD-6 | AI Moderation Queue View | MUST |
 
 ### AD-1: User Search by Email or ID
 
@@ -32,14 +34,13 @@ The system MUST allow admins to search users by email (exact or partial match) o
 
 ### AD-2: Report Review Queue (filter + resolve)
 
-The system MUST present a report review queue sorted by report date, oldest first. Admins SHALL see reporter, reported user, reason, description, and timestamp. Reports MAY be filtered by status (`Pending`, `Resolved`, `Dismissed`).
+The system MUST present a report review queue sorted by report date, oldest first. Each row SHALL include reporter, reported user, reason, sub-category, description, and timestamp. Reports MAY be filtered by status (`Pending`, `Resolved`, `Dismissed`) and sub-category.
 
 #### Scenario: Open the pending reports queue
 
 - GIVEN an authenticated admin
 - WHEN they navigate to the report review queue
-- THEN all `Pending` reports are displayed in chronological order (oldest first)
-- AND each row shows reporter, reported user, reason, and report timestamp
+- THEN all `Pending` reports display with reason, sub-category, and timestamp
 
 #### Scenario: Dismiss a report as no action needed
 
@@ -76,3 +77,24 @@ The system MUST log every admin action — ban, unban, report resolution, photo 
 - GIVEN an admin bans user X
 - WHEN the ban is executed
 - THEN an immutable audit log entry is created with: admin ID, action `BanUser`, target user ID, UTC timestamp, and reason text
+
+### AD-5: Analytics Widgets
+
+The admin dashboard MUST display analytics widgets: DAU/WAU/MAU charts, subscription conversion rate, match rate, swipe-to-match ratio. Time filters SHALL support last 7d, 30d, 90d. All data MUST be computed via async aggregation (fire-and-forget).
+
+#### Scenario: View growth metrics
+
+- GIVEN an authenticated admin on the dashboard
+- WHEN the analytics tab is selected with "last 30 days" filter
+- THEN DAU/WAU/MAU charts render with daily data points
+- AND subscription conversion percentage is displayed
+
+### AD-6: AI Moderation Queue View
+
+The moderation queue MUST display AI confidence scores for flagged photos. Filters SHALL support AI decision type: auto-approved, flagged, appealed.
+
+#### Scenario: Filter by AI-flagged photos
+
+- GIVEN the moderation queue
+- WHEN the admin filters by "FlaggedByAI"
+- THEN only photos flagged by AI are displayed with their confidence scores
