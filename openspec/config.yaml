@@ -1,0 +1,36 @@
+schema: spec-driven
+
+context: |
+  Project: dinder — dating app learning project (clean start, Module 1)
+  Stack: .NET 10, Angular 20 (later), PostgreSQL, Docker
+  Architecture: Clean Architecture (Domain, Application, Infrastructure, Presentation)
+  CQRS: Planned for Module 2 with MediatR
+  Testing: xUnit (dotnet templates available, not yet scaffolded)
+  Learning path: one concept per module, hands-on
+
+rules:
+  proposal:
+    - Keep scope small and focused (one concept per module)
+    - Include explicit learning objectives
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Follow Clean Architecture layer boundaries strictly
+    - Document architecture decisions with rationale
+    - Include layer dependency diagram when introducing new layers
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks small enough to complete in one session
+    - Prefer tasks that teach a concept over tasks that just configure
+  apply:
+    - Follow patterns established in LEARNING-PATH.md
+    - User writes the code; agent provides guidance
+    tdd: false
+    test_command: "dotnet test"
+  verify:
+    test_command: "dotnet test"
+    build_command: "dotnet build"
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas
