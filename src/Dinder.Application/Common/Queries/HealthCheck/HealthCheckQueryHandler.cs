@@ -1,3 +1,5 @@
+using Dinder.Application.Common.Models;
+
 namespace Dinder.Application.Common.Queries.HealthCheck;
 // El handler es quien realmente hace el trabajo.
 // MediatR busca automáticamente cualquier IRequestHandler<Query, Resultado> y lo ejecuta.
