@@ -1,41 +1,36 @@
-# .NET
+## .NET
 bin/
 obj/
 *.user
 *.suo
-*.cache
-*.DotSettings.user
-.vs/
-
-# Node / Angular
-node_modules/
-dist/
-.angular/
-
-# Docker
-.env
-docker-compose.override.yml
-
-# IDE
-.idea/
+*.userosscache
 *.sln.docstates
+*.userprefs
+.vs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
 
-# OS
-Thumbs.db
+## NuGet
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nupkg
+**/[Pp]ackages/repositories.config
+
+## Rider / VS Code
+.idea/
+.vscode/
+
+## Docker
+.docker/
+
+## OS
 .DS_Store
+Thumbs.db
 
-# Android / Kotlin
-mobile/.gradle/
-mobile/build/
-mobile/app/build/
-mobile/local.properties
-*.apk
-*.aab
-*.ap_
-*.dex
-*.class
-*.log
-gen/
-
-# OpenSpec (keep the directory, but not tracking artifacts)
-openspec/project.md
+## Secrets
+appsettings.*.json
+!appsettings.json
+!appsettings.Development.json
+*.env

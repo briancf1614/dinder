@@ -1,0 +1,41 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.DotSettings.user
+.vs/
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+
+# Docker
+.env
+docker-compose.override.yml
+
+# IDE
+.idea/
+*.sln.docstates
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Android / Kotlin
+mobile/.gradle/
+mobile/build/
+mobile/app/build/
+mobile/local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+*.log
+gen/
+
+# OpenSpec (keep the directory, but not tracking artifacts)
+openspec/project.md

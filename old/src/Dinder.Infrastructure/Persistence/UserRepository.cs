@@ -1,6 +1,7 @@
 using Dinder.Domain.Entities;
 using Dinder.Domain.Enums;
 using Dinder.Domain.Interfaces;
+using Dinder.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dinder.Infrastructure.Persistence;
@@ -24,11 +25,11 @@ public sealed class UserRepository : IUserRepository
 
     public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
-        var normalized = email.ToLowerInvariant();
+        var emailVO = new Email(email);
         return await _context.Users
             .Include(u => u.ExternalLogins)
             .Include(u => u.RefreshTokens)
-            .FirstOrDefaultAsync(u => EF.Property<string>(u, "Email") == normalized, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Email == emailVO, cancellationToken);
     }
 
     public async Task<User?> GetByExternalLoginAsync(
@@ -60,8 +61,8 @@ public sealed class UserRepository : IUserRepository
 
     public async Task<bool> EmailExistsAsync(string email, CancellationToken cancellationToken = default)
     {
-        var normalized = email.ToLowerInvariant();
-        return await _context.Users.AnyAsync(u => EF.Property<string>(u, "Email") == normalized, cancellationToken);
+        var emailVO = new Email(email);
+        return await _context.Users.AnyAsync(u => u.Email == emailVO, cancellationToken);
     }
 
     public void Add(User user) => _context.Users.Add(user);
