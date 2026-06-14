@@ -7,7 +7,7 @@
 
 ## 📍 Dónde estamos ahora
 
-**Estado actual:** Módulo 1 completado ✅. Estamos en el **Módulo 2 — CQRS Core**.
+**Estado actual:** Módulos 1-3 completados ✅. Seguimos con **Módulo 4 — Testing**.
 
 ---
 
@@ -18,8 +18,9 @@ Cada módulo = un concepto nuevo + una feature chiquita que lo aplica.
 | N°  | Módulo | Conceptos nuevos | Feature que construimos |
 |-----|--------|------------------|------------------------|
 | 1   | **Fundación** ✅ | Clean Architecture, estructura .NET, Docker | Esqueleto de la solución |
-| 2   | **CQRS Core** 🔵 | CQRS, MediatR, Command/Query pattern | Health check endpoint |
-| 3   | **Persistencia** | EF Core, migraciones, PostgreSQL, Repository | Entidad User + migración |
+| 2   | **CQRS Core** ✅ | CQRS, MediatR, Command/Query pattern | Health check endpoint |
+| 3   | **Persistencia** ✅ | EF Core, migraciones, PostgreSQL, Repository | Entidad User + migración |
+| 4   | **Testing** 🔵 | Unit tests, integration tests, TDD | Tests de todo lo anterior |
 | 4   | **Testing** | Unit tests, integration tests, TDD | Tests de todo lo anterior |
 | 5   | **Identity** | JWT, bcrypt, FluentValidation | Register + Login + Refresh |
 | 6   | **API Gateway** | YARP, routing, rate limiting | Gateway expuesto |
