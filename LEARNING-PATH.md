@@ -7,8 +7,7 @@
 
 ## 📍 Dónde estamos ahora
 
-**Estado actual:** Recién arrancamos. Todo el código anterior está en `old/`.
-Estamos en el **Módulo 1 — Fundación**.
+**Estado actual:** Módulo 1 completado ✅. Estamos en el **Módulo 2 — CQRS Core**.
 
 ---
 
@@ -18,8 +17,8 @@ Cada módulo = un concepto nuevo + una feature chiquita que lo aplica.
 
 | N°  | Módulo | Conceptos nuevos | Feature que construimos |
 |-----|--------|------------------|------------------------|
-| 1   | **Fundación** | Clean Architecture, estructura .NET, Docker | Esqueleto de la solución |
-| 2   | **CQRS Core** | CQRS, MediatR, Command/Query pattern | Health check endpoint |
+| 1   | **Fundación** ✅ | Clean Architecture, estructura .NET, Docker | Esqueleto de la solución |
+| 2   | **CQRS Core** 🔵 | CQRS, MediatR, Command/Query pattern | Health check endpoint |
 | 3   | **Persistencia** | EF Core, migraciones, PostgreSQL, Repository | Entidad User + migración |
 | 4   | **Testing** | Unit tests, integration tests, TDD | Tests de todo lo anterior |
 | 5   | **Identity** | JWT, bcrypt, FluentValidation | Register + Login + Refresh |

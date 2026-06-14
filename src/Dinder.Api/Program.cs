@@ -1,13 +1,16 @@
+using Dinder.Application.Common.Queries.HealthCheck;
+using MediatR;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<HealthCheckQuery>());
 
 var app = builder.Build();
 
-var summaries = new[]
+app.MapGet("/health", async (IMediator mediator) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
+    var result = await mediator.Send(new HealthCheckQuery());
+    return Results.Ok(result);
+});
 app.MapGet("/", () => "Dinder API running!");
-
 app.Run();
