@@ -8,5 +8,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Dinder.UnitTests/Dinder.UnitTests.csproj" />
+    <Project Path="tests/Dinder.IntegrationTests/Dinder.IntegrationTests.csproj" />
   </Folder>
 </Solution>
