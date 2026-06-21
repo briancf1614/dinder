@@ -6,4 +6,7 @@
     <Project Path="src/Dinder.Domain/Dinder.Domain.csproj" />
     <Project Path="src/Dinder.Infrastructure/Dinder.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Dinder.UnitTests/Dinder.UnitTests.csproj" />
+  </Folder>
 </Solution>
