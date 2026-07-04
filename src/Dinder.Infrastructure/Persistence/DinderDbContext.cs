@@ -1,4 +1,5 @@
-﻿using Dinder.Domain.Entities;
+﻿using Dinder.Application.Common.Interfaces;
+using Dinder.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Text;
 
 namespace Dinder.Infrastructure.Persistence
 {
-    public class DinderDbContext : DbContext
+    public class DinderDbContext : DbContext, IApplicationDbContext
     {
         public DinderDbContext(DbContextOptions<DinderDbContext> options) : base(options)
         {

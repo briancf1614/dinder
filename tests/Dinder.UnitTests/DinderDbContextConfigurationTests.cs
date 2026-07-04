@@ -20,7 +20,7 @@ public class DinderDbContextConfigurationTests
         using var context = new DinderDbContext(CreateOptions());
         var userEntity = context.Model.FindEntityType(typeof(User))!;
         // Act: buscamos la propiedad Email en el modelo
-        var emailProperty = userEntity.FindProperty("Email")!;
+        var emailProperty = userEntity.FindProperty(nameof(User.Email));
         // Assert: OnModelCreating configuró HasMaxLength(256)
         Assert.Equal(256, emailProperty.GetMaxLength());
     }
