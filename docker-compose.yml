@@ -3,7 +3,7 @@ services:
     image: postgres:17-alpine
     environment:
       POSTGRES_USER: dinder
-      POSTGRES_PASSWORD: dinder123
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: dinder
     ports:
       - "5432:5432"
@@ -19,8 +19,9 @@ services:
     depends_on:
       - postgres
     environment:
-      - ConnectionStrings__Default=Host=postgres;Port=5432;Database=dinder;Username=dinder;Password=dinder123
+      - ConnectionStrings__Default=Host=postgres;Port=5432;Database=dinder;Username=dinder;Password=${POSTGRES_PASSWORD}
       - ASPNETCORE_URLS=http://+:5022
+      - Jwt__Secret=${JWT_SECRET}
     networks:
       - dinder-net
     # Sin "ports:" → interno, solo accesible desde nginx
