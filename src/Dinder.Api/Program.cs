@@ -10,6 +10,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +30,44 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 
 // ─── FluentValidation ───
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
+
+// ─── Swagger / OpenAPI ───
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Dinder API",
+        Version = "v1",
+        Description = "Dating app API — learning project"
+    });
+
+    // Permitir pegar el JWT en Swagger UI para probar endpoints [Authorize]
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Pegá tu JWT acá (sin 'Bearer ' adelante, Swagger lo agrega solo)"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 // ─── JWT Auth ───
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -55,6 +94,16 @@ var app = builder.Build();
 // ─── Middleware ───
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Swagger UI (solo en Development por seguridad)
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Dinder API v1");
+    });
+}
 
 app.MapGet("/health", async (IMediator mediator) =>
 {
