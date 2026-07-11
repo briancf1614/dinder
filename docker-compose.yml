@@ -9,5 +9,47 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - dinder-net
+
+  api:
+    build:
+      context: .
+      dockerfile: src/Dinder.Api/Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      - ConnectionStrings__Default=Host=postgres;Port=5432;Database=dinder;Username=dinder;Password=dinder123
+      - ASPNETCORE_URLS=http://+:5022
+    networks:
+      - dinder-net
+    # Sin "ports:" → interno, solo accesible desde nginx
+
+  health:
+    build:
+      context: ./src/Dinder.Health
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_URLS=http://+:5001
+    networks:
+      - dinder-net
+    # Sin "ports:" → interno
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+      - health
+    networks:
+      - dinder-net
+
 volumes:
   pgdata:
+
+networks:
+  dinder-net:
+    driver: bridge

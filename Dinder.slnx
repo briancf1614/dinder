@@ -4,10 +4,11 @@
     <Project Path="src/Dinder.Application/Dinder.Application.csproj" />
     <Project Path="src/Dinder.Contracts/Dinder.Contracts.csproj" />
     <Project Path="src/Dinder.Domain/Dinder.Domain.csproj" />
+    <Project Path="src/Dinder.Health/Dinder.Health.csproj" />
     <Project Path="src/Dinder.Infrastructure/Dinder.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/Dinder.UnitTests/Dinder.UnitTests.csproj" />
     <Project Path="tests/Dinder.IntegrationTests/Dinder.IntegrationTests.csproj" />
+    <Project Path="tests/Dinder.UnitTests/Dinder.UnitTests.csproj" />
   </Folder>
 </Solution>
