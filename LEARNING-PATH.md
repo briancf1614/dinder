@@ -7,7 +7,7 @@
 
 ## 📍 Dónde estamos ahora
 
-**Estado actual:** Módulos 1-3 completados ✅. Seguimos con **Módulo 4 — Testing**.
+**Estado actual:** Módulos 1-7 completados ✅. Seguimos con **Módulo 8 — Perfiles de Usuario**.
 
 ---
 
@@ -20,10 +20,10 @@ Cada módulo = un concepto nuevo + una feature chiquita que lo aplica.
 | 1   | **Fundación** ✅ | Clean Architecture, estructura .NET, Docker | Esqueleto de la solución |
 | 2   | **CQRS Core** ✅ | CQRS, MediatR, Command/Query pattern | Health check endpoint |
 | 3   | **Persistencia** ✅ | EF Core, migraciones, PostgreSQL, Repository | Entidad User + migración |
-| 4   | **Testing** 🔵 | Unit tests, integration tests, TDD | Tests de todo lo anterior |
-| 4   | **Testing** | Unit tests, integration tests, TDD | Tests de todo lo anterior |
-| 5   | **Identity** | JWT, bcrypt, FluentValidation | Register + Login + Refresh |
-| 6   | **API Gateway** | YARP, routing, rate limiting | Gateway expuesto |
+| 4   | **Testing** ✅ | Unit tests, integration tests, TDD | Tests de todo lo anterior |
+| 5   | **Identity** ✅ | JWT, bcrypt, FluentValidation | Register + Login + Refresh |
+| 6   | **API Gateway** ✅ | nginx, reverse proxy, routing | Gateway expuesto |
+| 7   | **Deploy** ✅ | GitHub Actions, CI/CD, SSH deploy, Secrets | App en producción (Oracle ARM) |
 | 🔲  | ... | Progresivamente: Profiles, Discovery, Chat, etc. | ... |
 
 ### Qué significa cada columna
