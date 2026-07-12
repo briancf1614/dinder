@@ -366,4 +366,112 @@ public string Email { get; set; }          // NO puede ser null (el compilador a
 
 ---
 
-*Última actualización: Módulo 5 completo*
+## Módulo 6 — API Gateway (nginx)
+
+### Reverse Proxy
+
+Un reverse proxy se pone **delante** de tus servicios. El cliente habla con el proxy, y el proxy redirige al servicio correcto:
+
+```
+Cliente → nginx (:80) → /api/*  → Dinder API (:5022)
+                       → /health → Health Service (:5001)
+```
+
+**¿Para qué sirve?**
+- Un solo punto de entrada (los clientes no saben cuántos servicios hay)
+- Load balancing (repartir tráfico entre varias instancias)
+- SSL termination (HTTPS en el proxy, HTTP interno)
+- Rate limiting, caching, security headers
+
+```nginx
+# nginx.conf
+server {
+    listen 80;
+    location /api/ {
+        proxy_pass http://api:5022;
+    }
+    location /health {
+        proxy_pass http://health:5001;
+    }
+}
+```
+
+### Docker Networking
+
+Los containers en la misma red Docker se **ven por nombre de servicio**, no por IP:
+
+```
+docker-compose.yml:
+  networks:
+    - dinder-net     ← Todos los servicios comparten esta red
+
+nginx → http://api:5022     ← "api" = nombre del servicio en docker-compose
+nginx → http://health:5001  ← Docker resuelve el nombre a la IP interna
+```
+
+---
+
+## Módulo 7 — Deploy (CI/CD + Oracle ARM)
+
+### CI/CD Pipeline
+
+Automatización que ejecuta tareas cuando pusheás código. Dos pipelines típicos:
+
+| Pipeline | Cuándo | Qué hace |
+|----------|--------|----------|
+| **PR Check** | Creás un Pull Request | Corre tests → si fallan, no se puede mergear |
+| **Deploy** | Merge/push a main | Corre tests → si pasan, deploya a producción |
+
+### GitHub Actions
+
+Archivos YAML en `.github/workflows/` que definen qué pasa en cada evento:
+
+```yaml
+name: Deploy
+on:
+  push:
+    branches: [main]        # "Cuando alguien pushee a main..."
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # "En una VM de GitHub..."
+    steps:
+      - name: Run tests
+        run: dotnet test    # "Corré los tests..."
+      - name: SSH deploy
+        uses: appleboy/ssh-action@v1  # "Conectate al server..."
+```
+
+### Secrets vs Variables de Entorno
+
+- **GitHub Secrets**: contraseñas cifradas que solo GitHub Actions puede leer. **Nunca** en el código.
+- **.env**: archivo local (gitignored) con variables de entorno para desarrollo.
+- **Flujo**: GitHub Secrets → workflow → `.env` en el server → `docker compose` las lee.
+
+```bash
+# El workflow crea .env en el server desde Secrets:
+printf 'POSTGRES_PASSWORD=%s\n' "$POSTGRES_PASSWORD" > .env
+```
+
+### Build en Server vs Registry
+
+| | Build en server | Container Registry |
+|---|:--:|:--:|
+| Cómo | SSH → git pull → docker build | CI build → push imagen → server pull |
+| Velocidad ARM | ✅ Rápido (nativo) | ❌ Lento (QEMU emula ARM) |
+| Rollback | git checkout commit anterior | docker pull imagen vieja |
+| Cuándo usar | 1 server, proyecto chico | Múltiples servers, Kubernetes |
+
+### SSH Key para CI/CD
+
+Una llave SSH permite que GitHub Actions se conecte al server sin password:
+
+```
+Tu PC: ssh-keygen → genera llave privada + pública
+Server: llave pública en ~/.ssh/authorized_keys
+GitHub: llave privada en Settings → Secrets → SSH_KEY
+```
+
+---
+
+*Última actualización: Módulo 7 completo*
