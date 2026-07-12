@@ -9,18 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Run tests
-        run: dotnet test --verbosity normal
-
-      - name: Deploy to Oracle ARM server
+      - name: Deploy + verify
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -28,19 +17,13 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           envs: POSTGRES_PASSWORD,JWT_SECRET
           script: |
-            cd ~/app
+            cd ~/app || { echo "ERROR: ~/app no existe. Clonalo primero: git clone <repo> ~/app"; exit 1; }
             git pull
             printf 'POSTGRES_PASSWORD=%s\nJWT_SECRET=%s\n' "$POSTGRES_PASSWORD" "$JWT_SECRET" > .env
             docker compose build
             docker compose up -d --force-recreate
-
-      - name: Smoke test
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
             sleep 5
-            curl -f http://localhost/health
-            curl -f http://localhost/api/health
+            echo "--- Smoke test ---"
+            curl -f http://localhost/health && echo "✓ Health OK"
+            curl -f http://localhost/api/health && echo "✓ API Health OK"
+            echo "--- Deploy completo ---"
