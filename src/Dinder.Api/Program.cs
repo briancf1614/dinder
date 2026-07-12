@@ -6,6 +6,7 @@ using Dinder.Application.Common.Queries.Me;
 using Dinder.Infrastructure.Persistence;
 using Dinder.Infrastructure.Services;
 using FluentValidation;
+using Dinder.Application.Common.Behaviors;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHttpContextAccessor();
 
 // ─── MediatR ───
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<HealthCheckQuery>());
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssemblyContaining<HealthCheckQuery>();
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+});
 
 // ─── EF Core ───
 builder.Services.AddDbContext<DinderDbContext>(options =>
