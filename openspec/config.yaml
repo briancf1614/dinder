@@ -1,12 +1,15 @@
 schema: spec-driven
 
 context: |
-  Project: dinder — dating app learning project (clean start, Module 1)
-  Stack: .NET 10, Angular 20 (later), PostgreSQL, Docker
-  Architecture: Clean Architecture (Domain, Application, Infrastructure, Presentation)
-  CQRS: Planned for Module 2 with MediatR
-  Testing: xUnit (dotnet templates available, not yet scaffolded)
-  Learning path: one concept per module, hands-on
+  Project: dinder — dating app learning project (Module 6 complete)
+  Stack: .NET 10.0.201, ASP.NET Core, PostgreSQL 17 (Docker), Angular 20 (planned)
+  Architecture: Clean Architecture (Domain → Application → Infrastructure → Presentation)
+  CQRS: MediatR 14.1.0
+  Auth: JWT with refresh tokens (BCrypt.Net-Next, Microsoft.AspNetCore.Authentication.JwtBearer)
+  API Docs: Swagger/OpenAPI (Swashbuckle 6.9.0)
+  Validation: FluentValidation 12.1.1
+  Gateway: nginx reverse proxy on port 8080 → Dinder.Api (5022) + Dinder.Health (5001)
+  Testing: xUnit 2.9.3, Moq 4.20.72, Testcontainers.PostgreSql 4.3.0, coverlet 6.0.4
 
 rules:
   proposal:
@@ -26,7 +29,7 @@ rules:
   apply:
     - Follow patterns established in LEARNING-PATH.md
     - User writes the code; agent provides guidance
-    tdd: false
+    tdd: true
     test_command: "dotnet test"
   verify:
     test_command: "dotnet test"
@@ -34,3 +37,27 @@ rules:
     coverage_threshold: 0
   archive:
     - Warn before merging destructive deltas
+
+testing:
+  strict_tdd: true
+  test_runner: xUnit (2.9.3)
+  test_projects:
+    - name: Dinder.UnitTests
+      path: tests/Dinder.UnitTests
+      type: unit
+      framework: xUnit 2.9.3
+      mocking: Moq 4.20.72
+      coverage: coverlet.collector 6.0.4
+      db: EF Core InMemory 10.0.4
+      test_count: 6 test classes
+    - name: Dinder.IntegrationTests
+      path: tests/Dinder.IntegrationTests
+      type: integration
+      framework: xUnit 2.9.3
+      mocking: Moq 4.20.72
+      coverage: coverlet.collector 6.0.4
+      containers: Testcontainers.PostgreSql 4.3.0
+      api_testing: Microsoft.AspNetCore.Mvc.Testing 10.0.4
+      test_count: 6 test classes
+  build_command: dotnet build
+  coverage_tool: coverlet
