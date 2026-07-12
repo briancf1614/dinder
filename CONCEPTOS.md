@@ -123,10 +123,33 @@ mediator.Send(RegisterCommand {email, password})
   └── 2. Handler: buscar duplicado, hashear, guardar, devolver tokens
 ```
 
-### ¿Siempre hay que usar este patrón?
+### ¿Cómo se activa el Validator automáticamente?
 
-**NO.** Solo cuando la operación tiene lógica compleja o múltiples pasos.
-Para cosas simples (`/ping` → `"pong"`), no hace falta.
+Hay **3 piezas** que tienen que estar en `Program.cs` para que funcione:
+
+```csharp
+// 1. MediatR + ValidationBehavior — intercepta CADA request
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssemblyContaining<HealthCheckQuery>();
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));  // ← EL PEGAMENTO
+});
+
+// 2. FluentValidation — escanea y registra TODOS los validators
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
+```
+
+**Sin `ValidationBehavior`**, el validator EXISTE pero NADIE lo ejecuta. Es como tener un extintor en la pared sin que nadie lo use cuando hay fuego.
+
+**Regla de 3 archivos por Command:**
+
+```
+RegisterCommand.cs          ← Datos (record, 1 línea)
+RegisterCommandValidator.cs ← Validación (reglas FluentValidation)
+RegisterCommandHandler.cs   ← Lógica de negocio
+```
+
+**Nunca más tocás Program.cs** — las 3 líneas de arriba cubren cualquier Command/Validator que crees en el futuro.
 
 ### Organización de carpetas: por FEATURE, no por tipo
 
