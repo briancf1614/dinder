@@ -21,6 +21,12 @@ namespace Dinder.Infrastructure.Persistence
                 user.Property(u => u.Email).HasMaxLength(256).IsRequired();
                 user.HasIndex(u => u.Email).IsUnique();
                 user.Property(u => u.PasswordHash).IsRequired();
+                user.Property(u => u.DisplayName).HasMaxLength(100);
+                user.Property(u => u.Bio).HasMaxLength(500);
+                user.Property(u => u.BirthDate).HasColumnType("date");
+                user.Property(u => u.Gender)
+                    .HasConversion<string>()
+                    .HasMaxLength(20);
             });
         }
 

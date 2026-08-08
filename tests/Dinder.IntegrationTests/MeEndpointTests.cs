@@ -50,6 +50,19 @@ public class MeEndpointTests
         Assert.Equal(email, responseEmail.GetString());
 
         Assert.True(root.TryGetProperty("createdAt", out _));
+
+        // Profile fields — expected null for freshly registered user
+        Assert.True(root.TryGetProperty("displayName", out var displayName));
+        Assert.True(displayName.ValueKind == JsonValueKind.Null);
+
+        Assert.True(root.TryGetProperty("bio", out var bio));
+        Assert.True(bio.ValueKind == JsonValueKind.Null);
+
+        Assert.True(root.TryGetProperty("birthDate", out var birthDate));
+        Assert.True(birthDate.ValueKind == JsonValueKind.Null);
+
+        Assert.True(root.TryGetProperty("gender", out var gender));
+        Assert.True(gender.ValueKind == JsonValueKind.Null);
     }
 
     [Fact]

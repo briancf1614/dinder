@@ -1,5 +1,6 @@
 using Dinder.Application.Common.Commands.Auth.Login;
 using Dinder.Application.Common.Commands.Auth.Register;
+using Dinder.Application.Common.Commands.Profiles.UpdateProfile;
 using Dinder.Application.Common.Interfaces;
 using Dinder.Application.Common.Queries.HealthCheck;
 using Dinder.Application.Common.Queries.Me;
@@ -129,6 +130,12 @@ app.MapPost("/auth/refresh", async (RefreshCommand command, IMediator mediator) 
 app.MapGet("/me", [Microsoft.AspNetCore.Authorization.Authorize] async (IMediator mediator) =>
 {
     var result = await mediator.Send(new MeQuery());
+    return Results.Ok(result);
+});
+
+app.MapPut("/me/profile", [Microsoft.AspNetCore.Authorization.Authorize] async (UpdateProfileCommand command, IMediator mediator) =>
+{
+    var result = await mediator.Send(command);
     return Results.Ok(result);
 });
 

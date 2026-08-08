@@ -34,7 +34,8 @@ namespace Dinder.Application.Common.Queries.Me
             if (user is null)
                 throw new UnauthorizedAccessException("Usuario no encontrado");
             // 3. Devolver respuesta
-            return new MeResponse(user.Id, user.Email, user.CreatedAt);
+            return new MeResponse(user.Id, user.Email, user.CreatedAt,
+                user.DisplayName, user.Bio, user.BirthDate, user.Gender);
         }
     }
 }
